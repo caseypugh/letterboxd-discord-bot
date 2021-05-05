@@ -1,0 +1,24 @@
+{
+  "name": "letterboxd-bot",
+  "version": "0.1.0",
+  "description": "Letterbox Discord Bot",
+  "main": "bot.js",
+  "repository": "https://github.com/caseypugh/letterboxc-discord-bot",
+  "author": "Casey Pugh <me@caseypugh.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cron": "^1.8.2",
+    "discord.js": "^12.4.1",
+    "dotenv": "^8.2.0",
+    "letterboxd": "^2.0.0",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9"
+  },
+  "scripts": {
+    "start": "node bot.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": "14"
+  }
+}
