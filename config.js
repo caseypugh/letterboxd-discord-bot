@@ -27,7 +27,7 @@ const addUser = function (username) {
     config[USERS_KEY] = [];
   }
 
-  let u = config[USERS_KEY].find(u => u['username'] == username);
+  let u = config[USERS_KEY].find(u => u.username == username);
 
   if (u !== undefined) {
     console.warn("user already added");
@@ -43,6 +43,13 @@ const addUser = function (username) {
   saveConfig(config);
 };
 
+const removeUser = function (username) {
+  const config = getConfig();
+  const filtered = config[USERS_KEY].filter(u => u.username != username);
+  config[USERS_KEY] = filtered;
+  saveConfig(config);
+};
+
 const updateUser = function (username) {
   let config = getConfig();
 
@@ -53,13 +60,6 @@ const updateUser = function (username) {
   }
   saveConfig(config);
 }
-
-const removeUser = function (username) {
-  const config = getConfig();
-  const filtered = config[USERS_KEY].filter(u => u != username);
-  config[USERS_KEY] = filtered;
-  saveConfig(config);
-};
 
 const getUsers = function () {
   return getConfig()[USERS_KEY] || [];

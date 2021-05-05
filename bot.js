@@ -28,12 +28,15 @@ client.on('ready', () => {
     const users = Config.getUsers();
 
     // Loop through da users
+    let delay = 0;
     users.forEach(user => {
       (async () => {
-
+        // Stagger the calls
+        await new Promise(r => setTimeout(r, delay));
+        
         console.log(`Fetching RSS feed for ${user.username} - https://letterboxd.com/${user.username}/rss/`);
         const feed = await parser.parseURL(`https://letterboxd.com/${user.username}/rss/`);
-        
+
         feed.items.forEach(item => {
           const itemPubDate = Date.parse(item.pubDate);
           const userLastUpdate = Date.parse(user.updatedAt);
@@ -51,8 +54,9 @@ client.on('ready', () => {
             Config.updateUser(user.username);
           }
         });
-  
       })();
+
+      delay += 500;
     }); 
 
   }, null, true, 'America/Los_Angeles');
