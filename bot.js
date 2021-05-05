@@ -31,8 +31,9 @@ client.on('ready', () => {
     users.forEach(user => {
       (async () => {
 
-        const feed = await parser.parseURL(`https://letterboxd.com/${user['username']}/rss/`);
-
+        console.log(`Fetching RSS feed for ${user.username} - https://letterboxd.com/${user.username}/rss/`);
+        const feed = await parser.parseURL(`https://letterboxd.com/${user.username}/rss/`);
+        
         feed.items.forEach(item => {
           const itemPubDate = Date.parse(item.pubDate);
           const userLastUpdate = Date.parse(user.updatedAt);
