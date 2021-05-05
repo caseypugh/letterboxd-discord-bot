@@ -12,8 +12,9 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 
   // Poll feeds every 5 minutes 
-  var job = new CronJob('* */5 * * * *', function() {
-
+  var job = new CronJob('0 */5 * * * *', function() {
+    console.log("Job started...");
+    
     // If no channel set, list out all the channels to help you pick
     if (process.env.DISCORD_CHANNEL_ID === undefined) {
       console.log('Please set DISCORD_CHANNEL_ID');
@@ -33,7 +34,7 @@ client.on('ready', () => {
       (async () => {
         // Stagger the calls
         await new Promise(r => setTimeout(r, delay));
-        
+
         console.log(`Fetching RSS feed for ${user.username} - https://letterboxd.com/${user.username}/rss/`);
         const feed = await parser.parseURL(`https://letterboxd.com/${user.username}/rss/`);
 
