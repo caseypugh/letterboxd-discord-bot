@@ -11,8 +11,10 @@ let Parser = require('rss-parser');
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 
+  // Poll feeds every 5 minutes 
   var job = new CronJob('* */5 * * * *', function() {
 
+    // If no channel set, list out all the channels to help you pick
     if (process.env.DISCORD_CHANNEL_ID === undefined) {
       console.log('Please set DISCORD_CHANNEL_ID');
 
@@ -25,6 +27,7 @@ client.on('ready', () => {
     const parser = new Parser();
     const users = Config.getUsers();
 
+    // Loop through da users
     users.forEach(user => {
       (async () => {
 
@@ -34,12 +37,16 @@ client.on('ready', () => {
           const itemPubDate = Date.parse(item.pubDate);
           const userLastUpdate = Date.parse(user.updatedAt);
           
-          if (itemPubDate > userLastUpdate) {
+          // Only post if it's a new item
+          if (itemPubDate >= userLastUpdate) {
             let message = `${item.creator} watched ${item.title} ${item.link}`
-            console.log(message, itemPubDate, userLastUpdate, itemPubDate >= userLastUpdate);
             const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
-            console.log(channel);
+
+            console.log(message, itemPubDate, userLastUpdate, itemPubDate >= userLastUpdate);
+
             channel.send(message);
+
+            // Update the user updatedAt date
             Config.updateUser(user.username);
           }
         });
@@ -67,8 +74,12 @@ client.on('message', async message => {
       break;
 
     case 'letterboxd list':
-      await message.react("😂");
-      await message.channel.send("This doesnt work dummy lol!");
+      let response = "```\n";
+      Config.getUsers().forEach(u => {
+        response += `${u.username}\n`;
+      });
+      response += '```';
+      await message.channel.send(response);
       break;
 
     case 'letterboxd add':
