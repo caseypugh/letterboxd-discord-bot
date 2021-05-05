@@ -27,10 +27,32 @@ const addUser = function (username) {
     config[USERS_KEY] = [];
   }
 
-  config[USERS_KEY].push(username);
+  let u = config[USERS_KEY].find(u => u['username'] == username);
+
+  if (u !== undefined) {
+    console.warn("user already added");
+    return;
+  }
+
+  config[USERS_KEY].push({
+    username: username,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  });
 
   saveConfig(config);
 };
+
+const updateUser = function (username) {
+  let config = getConfig();
+
+  for (var i in config[USERS_KEY]) {
+    if (config[USERS_KEY][i].username == username) {
+      config[USERS_KEY][i].updatedAt = new Date();
+    }
+  }
+  saveConfig(config);
+}
 
 const removeUser = function (username) {
   const config = getConfig();
@@ -47,4 +69,5 @@ module.exports = {
   addUser,
   removeUser,
   getUsers,
+  updateUser
 };

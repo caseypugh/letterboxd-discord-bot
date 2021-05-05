@@ -6,11 +6,47 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const CronJob = require('cron').CronJob;
 
+let Parser = require('rss-parser');
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 
-  var job = new CronJob('* * * * * *', function() {
-    console.log('You will see this message every second');
+  var job = new CronJob('* */5 * * * *', function() {
+
+    if (process.env.DISCORD_CHANNEL_ID === undefined) {
+      console.log('Please set DISCORD_CHANNEL_ID');
+
+      client.channels.cache.forEach(channel => {
+        console.log(`DISCORD_CHANNEL_ID=${channel.id} - ${channel.name}`);
+      });
+      return;
+    }
+
+    const parser = new Parser();
+    const users = Config.getUsers();
+
+    users.forEach(user => {
+      (async () => {
+
+        const feed = await parser.parseURL(`https://letterboxd.com/${user['username']}/rss/`);
+
+        feed.items.forEach(item => {
+          const itemPubDate = Date.parse(item.pubDate);
+          const userLastUpdate = Date.parse(user.updatedAt);
+          
+          if (itemPubDate > userLastUpdate) {
+            let message = `${item.creator} watched ${item.title} ${item.link}`
+            console.log(message, itemPubDate, userLastUpdate, itemPubDate >= userLastUpdate);
+            const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
+            console.log(channel);
+            channel.send(message);
+            Config.updateUser(user.username);
+          }
+        });
+  
+      })();
+    }); 
+
   }, null, true, 'America/Los_Angeles');
   job.start();
 });
@@ -22,17 +58,22 @@ client.on('message', async message => {
 
   switch (command) {
     case 'letterboxd help':
+      let response = "```\n";
+      response += "letterboxd list\n";
+      response += "letterboxd add {username}\n";
+      response += "letterboxd remove {username}\n";
+      response += "```";
+      await message.channel.send(response);
       break;
 
     case 'letterboxd list':
-      // Config.addUser(args[2]);
-      await message.channel.send("Added!");
+      await message.react("😂");
+      await message.channel.send("This doesnt work dummy lol!");
       break;
 
     case 'letterboxd add':
       Config.addUser(args[2]);
       await message.react("👍");
-      // await message.channel.send("Added!");
       break;
 
     case 'letterboxd remove':
