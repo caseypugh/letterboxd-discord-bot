@@ -65,21 +65,21 @@ client.on('message', async message => {
 
   switch (command) {
     case 'letterboxd help':
-      let response = "```\n";
-      response += "letterboxd list\n";
-      response += "letterboxd add {username}\n";
-      response += "letterboxd remove {username}\n";
-      response += "```";
-      await message.channel.send(response);
+      output = "```\n";
+      output += "letterboxd list\n";
+      output += "letterboxd add {username}\n";
+      output += "letterboxd remove {username}\n";
+      output += "```";
+      await message.channel.send(output);
       break;
 
     case 'letterboxd list':
-      let response = "```\n";
+      output = "```\n";
       Config.getUsers().forEach(u => {
-        response += `${u.username}\n`;
+        output += `${u.username}\n`;
       });
-      response += '```';
-      await message.channel.send(response);
+      output += '```';
+      await message.channel.send(output);
       break;
 
     case 'letterboxd add':
