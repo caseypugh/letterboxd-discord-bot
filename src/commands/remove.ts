@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommandInteraction, Client } from "discord.js";
+import { errorMessageEmbed } from "src/lib/error";
 import { User } from "../data/user";
 import { Command } from "./command";
 
@@ -27,7 +28,7 @@ export const RemoveUserCommand: Command = {
         if (!user) {
             await interaction.followUp({
                 ephemeral: true,
-                content: `Error: Couldn't find \`${user.username}\`!`
+                embeds: [ errorMessageEmbed(`Couldn't find \`${username }\`!`) ]
             })
             return
         }

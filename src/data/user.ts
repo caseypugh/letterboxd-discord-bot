@@ -94,6 +94,10 @@ export class User {
         return rsp.status != 404
     }
 
+    public async exists(): Promise<boolean> {
+        return await User.get(this.username, this.guildId) != null
+    }
+
     public async getLatestDiaryEntries(): Promise<RSSItem[]> {
         console.log(`Fetching RSS feed for ${this.username} - ${this.letterboxdRssUrl}`);
         const parser = new Parser({
@@ -135,7 +139,7 @@ export class User {
         }
 
         // initial insert
-        if (!this.loaded) {
+        if (!this.loaded && !this.exists()) {
             // console.log(`${this._username} inserted`)
             if (!this.createdAt) this.createdAt = new Date().getTime()
             if (!this.updatedAt) this.updatedAt = new Date().getTime()
@@ -147,6 +151,8 @@ export class User {
         else {
             // console.log(`${this._username} updated`)
         }
+
+        this.loaded = true
         return await DB('users', this.guildId).set(this.username, this)
     }
 

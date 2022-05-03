@@ -23,8 +23,8 @@ const client = new Client({
 })
 
 client.on("ready", async () => {
-    console.log('\n----------- Booting up -----------')
-    console.log(`${client.user.username} is online`);
+    console.log(`\n----------- ${client.user.username} is online -----------`)
+
     if (!client.user || !client.application) {
         return;
     }
