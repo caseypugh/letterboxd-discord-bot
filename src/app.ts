@@ -1,10 +1,9 @@
-import { Client, Guild, Permissions, InviteScope } from "discord.js";
+import { Client, Permissions, InviteScope } from "discord.js";
 import interactionCreate from "./listeners/interactionCreate";
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds";
 import 'dotenv/config'
 import { DeployCommands } from "./tools/deploy-commands";
-import { User } from "./data/user";
 import guildCreate from "./listeners/guildCreate";
 import guildDelete from "./listeners/guildDelete";
 import error from "./listeners/error";
@@ -25,23 +24,24 @@ const client = new Client({
 
 client.on("ready", async () => {
     console.log('\n----------- Booting up -----------')
+    console.log(`${client.user.username} is online`);
     if (!client.user || !client.application) {
         return;
     }
 
+    // Deploy the latest commands to every guild
     const guilds = await client.guilds.fetch()
     guilds.forEach(async guild => {
         console.log(`Deploying commands to ${guild.name} (${guild.id}) ...`)
         DeployCommands(guild.id)
     })
 
-    console.log(`${client.user.username} is online`);
-
-    const job = new CronJob('0 */1 * * * *', async () => {
-        await CheckFeeds(client)
+    // Run the feed check every minute
+    const job = new CronJob({
+        cronTime: '0 */1 * * * *',
+        onTick: () => CheckFeeds(client),
+        runOnInit: true
     })
-
-    await CheckFeeds(client)
     job.start()
 })
 
