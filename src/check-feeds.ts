@@ -1,12 +1,11 @@
 
 import { Client, MessageEmbed, TextChannel } from "discord.js"
 import { User } from "./data/user"
-import Parser from "rss-parser"
 import delay from "promise-delay-ts"
 import TimeAgo from 'javascript-time-ago'
 
 import en from 'javascript-time-ago/locale/en.json'
-import { ItemType, parseItem, RSSItem } from "./lib/rss"
+import { ItemType } from "./lib/rss"
 TimeAgo.addDefaultLocale(en)
 const timeAgo = new TimeAgo('en-US')
 
@@ -36,17 +35,9 @@ export const CheckFeeds = async (client: Client) => {
     catch (e) {
         console.error('Channel not found')
     }
-    const users = await User.all(process.env.DISCORD_GUILD_ID)
-    const delayBeforeCheck = 60 * 10 * 1000  // 10 minutes
+    const users = await User.allStale(process.env.DISCORD_GUILD_ID)
 
-    for await (let user of users) {
-        const elapsed = new Date().getTime() - (user.lastCheckedAt || 0)
-
-        if (elapsed <= delayBeforeCheck) {
-            console.log(`=> Skipping ${user.username} - last updated`, elapsed / 1000, 'seconds ago')
-            continue
-        }
-
+    for (let user of users) {
         await delay(500)
         const items = await user.getLatestDiaryEntries()
 

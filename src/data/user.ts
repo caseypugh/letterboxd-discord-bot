@@ -47,6 +47,18 @@ export class User {
         return promise
     }
 
+    public static async allStale(guildId: string): Promise<User[]> {
+        const delayBeforeCheck = 60 * 10 * 1000  // 10 minutes
+        const users = await User.all(guildId)
+
+        return users.filter(user => {
+            const elapsed = new Date().getTime() - (user.lastCheckedAt || 0)
+            // if (elapsed <= delayBeforeCheck)
+            //     console.log(`=> Skipping ${user.username} - last updated`, elapsed / 1000, 'seconds ago', user.lastCheckedAt)
+            return elapsed > delayBeforeCheck
+        })
+    }
+
     public static parseUsername(username: string): string {
         const match = username.match(/\/\/letterboxd\.com\/([a-z0-9_]+)/)
         if (match) {
@@ -95,7 +107,7 @@ export class User {
     }
 
     public async exists(): Promise<boolean> {
-        return await User.get(this.username, this.guildId) != null
+        return (await User.get(this.username, this.guildId)) != null
     }
 
     public async getLatestDiaryEntries(): Promise<RSSItem[]> {
@@ -139,8 +151,7 @@ export class User {
         }
 
         // initial insert
-        if (!this.loaded && !this.exists()) {
-            // console.log(`${this._username} inserted`)
+        if (!this.loaded && !(await this.exists())) {
             if (!this.createdAt) this.createdAt = new Date().getTime()
             if (!this.updatedAt) this.updatedAt = new Date().getTime()
 
