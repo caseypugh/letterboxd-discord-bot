@@ -48,12 +48,13 @@ export const CheckFeeds = async (client: Client) => {
         }
 
         await delay(500)
-        const items = await getNewEntriesByUserRSS(user)
+        const items = await user.getLatestDiaryEntries()
 
         user.lastCheckedAt = new Date().getTime()
         user.save()
 
         for await (const item of items) {
+            // Format and post new items to the Discord channel
             await delay(1000)
             let message = `${item.creator} watched ${item.filmTitle} ${item.link}`
             console.log(item, message)
@@ -91,35 +92,4 @@ export const CheckFeeds = async (client: Client) => {
 
     processing = false
     console.log("CheckFeeds finished!");
-}
-
-async function getNewEntriesByUserRSS(user: User): Promise<RSSItem[]> {
-    console.log(`Fetching RSS feed for ${user.username} - https://letterboxd.com/${user.username}/rss/`);
-    const parser = new Parser({
-        customFields: {
-            item: [
-                ['letterboxd:rewatch', 'rewatch'],
-                ['letterboxd:watchedDate', 'watchedDate'],
-                ['letterboxd:filmTitle', 'filmTitle'],
-                ['letterboxd:filmYear', 'filmYear'],
-                ['letterboxd:memberRating', 'memberRating'],
-                ['dc:creator', 'creator'],
-            ]
-        }
-    })
-    let feed: RSSItem[] = []
-    try {
-        const data = await parser.parseURL(`https://letterboxd.com/${user.username}/rss/`)
-        feed = data.items
-            .map(i => parseItem(i))
-            .filter(i => i.type == ItemType.Review || i.type == ItemType.Watch)
-    }
-    catch (e) {
-        console.error(e)
-        return feed
-    }
-
-
-    return feed.filter(item => item.pubDate.getTime() >= new Date(user.updatedAt).getTime())
-    // return feed.slice(0, 5)
 }
