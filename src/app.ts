@@ -5,6 +5,9 @@ import { CheckFeeds } from "./check-feeds";
 import 'dotenv/config'
 import { DeployCommands } from "./tools/deploy-commands";
 import { User } from "./data/user";
+import guildCreate from "./listeners/guildCreate";
+import guildDelete from "./listeners/guildDelete";
+import error from "./listeners/error";
 
 console.log("Letterboxd is starting...");
 const permissions = Permissions.FLAGS.SEND_MESSAGES |
@@ -19,23 +22,6 @@ console.log(`Add bot to server => https://discord.com/api/oauth2/authorize?clien
 const client = new Client({
     intents: ["GUILDS", "GUILD_EMOJIS_AND_STICKERS"]
 })
-
-client.on("guildCreate", async (guild: Guild) => {
-    console.log("=> Joined a new Guild!", guild.name, guild.id)
-
-    // Create Slash commands upon joining the server
-    await DeployCommands(guild.id)
-})
-
-client.on("guildDelete", async (guild: Guild) => {
-    console.log("Left Guild", guild.name, guild.id)
-
-    await User.clear(guild.id)
-
-    console.log("All users deleted")
-})
-
-client.on("error", console.error)
 
 client.on("ready", async () => {
     console.log('\n----------- Booting up -----------')
@@ -60,5 +46,8 @@ client.on("ready", async () => {
 })
 
 interactionCreate(client)
+guildCreate(client)
+guildDelete(client)
+error(client)
 
 client.login(process.env.DISCORD_TOKEN)
