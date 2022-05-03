@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Letterbox Discord Bot",
   "main": "bot.js",
-  "repository": "https://github.com/caseypugh/letterboxc-discord-bot",
+  "repository": "https://github.com/caseypugh/letterboxd-discord-bot",
   "author": "Casey Pugh",
   "license": "MIT",
   "engines": {
