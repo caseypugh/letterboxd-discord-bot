@@ -13,11 +13,11 @@ const timeAgo = new TimeAgo('en-US')
 let processing: boolean = false
 export const CheckFeeds = async (client: Client) => {
     if (processing) {
-        console.log("CheckFeeds already running")
+        console.warn("CheckFeeds already running")
         return
     }
 
-    console.log("CheckFeeds started...");
+    console.log("\nChecking feeds ...");
     processing = true
     // If no channel set, list out all the channels to help you pick
     // if (process.env.DISCORD_CHANNEL_ID === undefined) {
@@ -43,7 +43,7 @@ export const CheckFeeds = async (client: Client) => {
         const elapsed = new Date().getTime() - (user.lastCheckedAt || 0)
 
         if (elapsed <= delayBeforeCheck) {
-            console.log(`Skipping ${user.username} - last updated`, elapsed / 1000, 'seconds ago')
+            console.log(`=> Skipping ${user.username} - last updated`, elapsed / 1000, 'seconds ago')
             continue
         }
 
@@ -57,7 +57,7 @@ export const CheckFeeds = async (client: Client) => {
             // Format and post new items to the Discord channel
             await delay(1000)
             let message = `${item.creator} watched ${item.filmTitle} ${item.link}`
-            console.log(item, message)
+            console.log('=>', item, message)
 
             const rewatched = item.rewatch ? 'rewatched' : 'watched'
             const desc = `[${item.creator}](${user.letterboxdUrl}) ${rewatched} ${timeAgo.format(item.watchedOn)}.`
@@ -91,5 +91,5 @@ export const CheckFeeds = async (client: Client) => {
     }
 
     processing = false
-    console.log("CheckFeeds finished!");
+    console.log("Finished!");
 }

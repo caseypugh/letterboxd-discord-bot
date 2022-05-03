@@ -8,7 +8,7 @@ const userParam = 'user'
 export const AddUserCommand: Command = {
     command: new SlashCommandBuilder()
         .setName('add')
-        .setDescription('Add a Letterboxd user')
+        .setDescription('Add a Letterboxd user.')
         .addStringOption((option) => option
             .setName(userParam)
             .setDescription('Enter the Letterboxd username or URL')

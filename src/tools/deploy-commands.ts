@@ -10,7 +10,7 @@ const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
 
 export async function DeployCommands(guildId: string): Promise<void> {
 	try {
-		console.log('Started refreshing application (/) commands.')
+		// console.log(`Deploying slash commands to ${guildId} ...`)
 
 		const resp = await rest.put(
 			Routes.applicationGuildCommands(clientId, guildId), {
@@ -19,7 +19,7 @@ export async function DeployCommands(guildId: string): Promise<void> {
 		)
 		// console.log(resp)
 
-		console.log('Successfully reloaded application (/) commands.')
+		// console.log('Successfully deployed slash commands.')
 	}
 	catch (error) {
 		console.error(error);

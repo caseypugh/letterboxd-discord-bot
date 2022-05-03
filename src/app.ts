@@ -3,10 +3,8 @@ import interactionCreate from "./listeners/interactionCreate";
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds";
 import 'dotenv/config'
-import { Commands } from "./commands/command";
 import { DeployCommands } from "./tools/deploy-commands";
 import { User } from "./data/user";
-import delay from "promise-delay-ts";
 
 console.log("Letterboxd is starting...");
 const permissions = Permissions.FLAGS.SEND_MESSAGES |
@@ -26,21 +24,13 @@ client.on("guildCreate", async (guild: Guild) => {
     console.log("=> Joined a new Guild!", guild.name, guild.id)
 
     // Create Slash commands upon joining the server
-    await delay(1000)
     await DeployCommands(guild.id)
-    // guild.commands.set(
-    //     Commands.map(c => c.command.toJSON())
-    // )
-    console.log("Deployed commands for Guild")
 })
 
 client.on("guildDelete", async (guild: Guild) => {
     console.log("Left Guild", guild.name, guild.id)
 
-    const users = await User.all(guild.id)
-    await Promise.all(users.map(async u => {
-        await u.delete()
-    }))
+    await User.clear(guild.id)
 
     console.log("All users deleted")
 })
@@ -52,13 +42,11 @@ client.on("ready", async () => {
     if (!client.user || !client.application) {
         return;
     }
-    // const commands = await client.application.commands.fetch()
-    // console.log(commands.first().delete())
 
     const guilds = await client.guilds.fetch()
     guilds.forEach(async guild => {
-        console.log(`Deploying commands to ${guild.name} (${guild.id})`)
-        // await DeployCommands(guild.id)
+        console.log(`Deploying commands to ${guild.name} (${guild.id}) ...`)
+        DeployCommands(guild.id)
     })
 
     console.log(`${client.user.username} is online`);

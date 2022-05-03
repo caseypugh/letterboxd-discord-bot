@@ -75,8 +75,12 @@ export class User {
         return user
     }
 
+    public static async clear(guildId: string): Promise<void> {
+        return await DB('users', guildId).clear()
+    }
+
     public get letterboxdUrl(): string {
-        return `https://letterboxd.com/${this.username}`
+        return `https://letterboxd.com/${this.username}/`
     }
 
     public get letterboxdRssUrl() :string {

@@ -7,7 +7,7 @@ const param = 'channel'
 export const ChannelCommand: Command = {
     command: new SlashCommandBuilder()
         .setName('channel')
-        .setDescription('Change the default channel diary entries get posted to')
+        .setDescription('Change the default channel diary entries get posted to.')
         .addChannelOption((option) => option
             .setName(param)
             .setDescription('The channel to post to')

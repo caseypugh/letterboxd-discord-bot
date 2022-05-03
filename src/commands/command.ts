@@ -12,7 +12,7 @@ export interface Command {
 
 export const Commands: Command[] = [
     ChannelCommand,
+    ListUsersCommand,
     AddUserCommand,
     RemoveUserCommand,
-    ListUsersCommand,
 ]
