@@ -1,5 +1,5 @@
-import df from "../data/df.json"
-import { User } from "./data/user"
+import df from "data/df.json"
+import { User } from "src/data/user"
 import 'dotenv/config'
 
 (async () => {

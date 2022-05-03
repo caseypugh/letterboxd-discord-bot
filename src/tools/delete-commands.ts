@@ -1,6 +1,6 @@
 import { REST } from '@discordjs/rest'
 import { Routes } from 'discord-api-types/v9'
-import { Commands } from './commands/command'
+import { Commands } from 'src/commands/command'
 import 'dotenv/config'
 
 const clientId = process.env.DISCORD_CLIENT_ID
@@ -12,7 +12,7 @@ const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
 	try {
 		console.log('Started refreshing application (/) commands.')
 
-		await rest.put(
+		await rest.delete(
 			Routes.applicationGuildCommands(clientId, guildId), {
 				body: Commands.map(c => c.command.toJSON())
 			},

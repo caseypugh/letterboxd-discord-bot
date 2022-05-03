@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommandInteraction, Client, GuildMember } from "discord.js";
+import { BaseCommandInteraction, Client } from "discord.js";
 import { User } from "../data/user";
 import { Command } from "./command";
 
@@ -10,7 +10,7 @@ export const RemoveUserCommand: Command = {
         .setDescription('Remove a Letterboxd user')
         .addStringOption((option) => option
             .setName(userParam)
-            .setDescription('Enter the username or URL of the Letterboxd user')
+            .setDescription('Enter the Letterboxd username or URL')
             .setRequired(true)
         ),
 

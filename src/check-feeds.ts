@@ -29,7 +29,13 @@ export const CheckFeeds = async (client: Client) => {
     //   return;
     // }
 
-    const channel = await client.channels.fetch(process.env.DISCORD_CHANNEL_ID) as TextChannel
+    let channel = null
+    try {
+        channel = await client.channels.fetch(process.env.DISCORD_CHANNEL_ID) as TextChannel
+    }
+    catch (e) {
+        console.error('Channel not found')
+    }
     const users = await User.all(process.env.DISCORD_GUILD_ID)
     const delayBeforeCheck = 60 * 10 * 1000  // 10 minutes
 

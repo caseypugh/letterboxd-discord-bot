@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommandInteraction, Client } from "discord.js";
-import { AddUserCommand } from "./add";
-import { ChannelCommand } from "./channel";
-import { ListUsersCommand } from "./list";
-import { RemoveUserCommand } from "./remove";
+import { AddUserCommand } from "src/commands/add";
+import { ChannelCommand } from "src/commands/channel";
+import { ListUsersCommand } from "src/commands/list";
+import { RemoveUserCommand } from "src/commands/remove";
 
 export interface Command {
     command: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
@@ -11,8 +11,8 @@ export interface Command {
 }
 
 export const Commands: Command[] = [
+    ChannelCommand,
     AddUserCommand,
     RemoveUserCommand,
     ListUsersCommand,
-    ChannelCommand
 ]

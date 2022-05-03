@@ -1,12 +1,12 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommandInteraction, Client, MessageEmbed } from "discord.js";
-import { User } from "../data/user";
+import { User } from "src/data/user";
 import { Command } from "./command";
 
 export const ListUsersCommand: Command = {
     command: new SlashCommandBuilder()
         .setName('list')
-        .setDescription('List all Letterboxd users that have been added'),
+        .setDescription('List all added Letterboxd users'),
 
     run: async (client: Client, interaction: BaseCommandInteraction) => {
         await interaction.deferReply({

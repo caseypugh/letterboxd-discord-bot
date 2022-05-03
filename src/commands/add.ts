@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommandInteraction, Client, GuildMember, MessageEmbed } from "discord.js";
-import { User } from "../data/user";
-import { errorMessageEmbed } from "../lib/error";
+import { BaseCommandInteraction, Client } from "discord.js";
+import { User } from "src/data/user";
+import { errorMessageEmbed } from "src/lib/error";
 import { Command } from "./command";
 
 const userParam = 'user'
@@ -11,7 +11,7 @@ export const AddUserCommand: Command = {
         .setDescription('Add a Letterboxd user')
         .addStringOption((option) => option
             .setName(userParam)
-            .setDescription('Enter the username or URL of a Letterboxd user')
+            .setDescription('Enter the Letterboxd username or URL')
             .setRequired(true)
         ),
 

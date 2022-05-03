@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2017", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */// "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-    // "module": "commonjs", /* Specify what module code is generated. */// "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    "baseUrl": "../",                                     /* Specify the base directory to resolve non-relative module names. */
-    "allowJs": true, /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
-    "esModuleInterop": true, /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */// "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
-    "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. *//* Type Checking */
-    "strict": true, /* Enable all strict type-checking options. */
-    "noImplicitAny": false,                               /* Enable error reporting for expressions and declarations with an implied `any` type.. */
-    "strictNullChecks": false,                           /* When type checking, take into account `null` and `undefined`. */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+    "target": "es2017",
+    "baseUrl": "./",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "skipLibCheck": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -22,8 +21,8 @@
     "jsx": "preserve"
   },
   "include": [
-    "**/*.ts",
-    "**/*.js",
+    "**/*/*.ts",
+    "**/*/*.js",
   ],
   "exclude": [
     "node_modules"

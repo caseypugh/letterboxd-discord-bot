@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommandInteraction, Client, GuildChannel, GuildMember, MessageEmbed } from "discord.js";
-import { errorMessageEmbed } from "../lib/error";
+import { BaseCommandInteraction, Client } from "discord.js";
+import { errorMessageEmbed } from "src/lib/error";
 import { Command } from "./command";
 
 const param = 'channel'
@@ -20,6 +20,7 @@ export const ChannelCommand: Command = {
         })
 
         const channel = interaction.options.get(param).value
+        console.log(channel)
 
         await interaction.followUp({
             embeds: [errorMessageEmbed("This doesnt work yet lol")]

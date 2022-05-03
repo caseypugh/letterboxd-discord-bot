@@ -10,11 +10,11 @@
     "node": "16"
   },
   "scripts": {
-    "start": "ts-node src/app.ts",
-    "dev": "nodemon --watch \"src/**/*\" --ext ts --exec \"ts-node src/app.ts\"",
+    "start": "NODE_PATH=./ ts-node src/app.ts",
+    "dev": "NODE_PATH=./ nodemon --watch \"src/**/*\" --ext ts --exec \"ts-node src/app.ts\"",
     "redis": "sudo service redis-server start",
-    "deploy-commands": "ts-node src/deploy-commands.ts",
-    "deploy-heroku": "git push heroku main",
+    "deploy-commands": "NODE_PATH=./ ts-node src/tools/deploy-commands.ts",
+    "deploy-heroku": "git push heroku main && heroku logs -t",
     "test": "ts-node test.ts"
   },
   "dependencies": {

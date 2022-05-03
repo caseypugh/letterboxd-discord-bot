@@ -1,6 +1,6 @@
 import Parser from "rss-parser"
-import { ItemType, parseItem, RSSItem } from "../lib/rss"
-import { DB, redis } from "./db"
+import { ItemType, parseItem, RSSItem } from "src/lib/rss"
+import { DB, redis } from "src/data/db"
 import fetch from 'node-fetch'
 
 export class User {
