@@ -38,11 +38,11 @@ export class User extends KeyvRecord<User> {
     }
 
     public onCreate(): void {
-        console.log('onCreate', this)
+        // console.log('onCreate', this)
     }
 
     public onUpdate(): void {
-        console.log('onUpdate', this)
+        // console.log('onUpdate', this)
     }
 
     public override async onBeforeCreate(): Promise<boolean> {
