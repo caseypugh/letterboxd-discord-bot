@@ -30,7 +30,6 @@ client.on("ready", async () => {
     }
 
     // Deploy the latest commands to every guild
-    // const guilds = await client.guilds.fetch()
     const guilds = await client.guilds.fetch()
     guilds.forEach(async guild => {
         DeployCommands(guild.id)

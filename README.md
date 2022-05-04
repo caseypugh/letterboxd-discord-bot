@@ -1,5 +1,4 @@
-# Letterboxd Discord Bot
-See what your friends are watching.
+<img src="public/discord-letterboxd-promo-wide.png" alt="Letterboxd Discord Bot Promo" />
 
 ## Overview
 This a simple bot that posts new diary entries from your Letterboxd friends to your preferred Discord channel.
