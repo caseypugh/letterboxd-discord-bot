@@ -12,10 +12,13 @@ Use this handy link to add the bot. Or follow the instructions below on how to r
 
 ## Commands
 
-- `/add` - Adds a Letterboxd user to monitor
-- `/remove` - Stop monitoring a Letterboxd use
-- `/list` - See a list of all the currently tracked usersr
-- `/channel` - Update which channel to post to
+- `/add` - Subscribes to a Letterboxd user's new diary entries
+- `/remove` - Unsubscribe a Letterboxd user
+- `/list` - See a list of all the current users
+- `/channel` - Update which channel to post to. (Defaults to the system channel)
+
+## How it works
+Right now all this bot does is scrape RSS feeds. I'm hoping to get access to Letterboxd API to introduce new functionality.
 
 ## How to run the bot yourself
 
