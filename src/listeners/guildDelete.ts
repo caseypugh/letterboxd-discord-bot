@@ -10,5 +10,8 @@ export default (client: Client): void => {
         console.log("Users deleted")
         await GuildConfig.clear(GuildConfig, guild.id)
         console.log("Guild config deleted")
+
+        // Load latest guilds into cache
+        await client.guilds.fetch()
     })
 }

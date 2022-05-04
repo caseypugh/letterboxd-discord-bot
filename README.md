@@ -3,7 +3,7 @@
 See what your friends are watching.
 </center>
 
-## Overview
+# Overview
 This a simple bot that posts new diary entries from your Letterboxd friends to your preferred Discord channel.
 
 ## Add to your Discord server!
@@ -17,11 +17,13 @@ Use this handy link to add the bot. Or follow the instructions below on how to r
 - `/list` - See a list of all the current users
 - `/channel` - Update which channel to post to. (Defaults to the system channel)
 
+
 ## How it works
 Right now all this bot does is scrape RSS feeds. I'm hoping to get access to Letterboxd API to introduce new functionality.
 
-## How to run the bot yourself
+# How to run the bot yourself
 
+### Initial setup
 Clone this repo to your computer.
 
 ```sh
@@ -30,14 +32,22 @@ cd letterboxd-discord-bot
 ```
 
 Make sure your have Node 16 installed. If you're using `nvm`...
-
 ```
 nvm install 16
 nvm use 16
 ```
 
-Install dependencies
+Data for this bot is stored in Redis. Make sure you ahve a Redis server running.
 
+Create an `.env` from the sample file and input your Discord credentials and local Redis server URL
+```sh
+cp .env.sample .env
+```
+
+
+
+### Development
+Install latest dependencies
 ```
 yarn install
 ```
