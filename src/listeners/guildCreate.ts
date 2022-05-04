@@ -1,5 +1,5 @@
 import { Client, Guild } from "discord.js"
-import { DeployCommands } from "src/tools/deploy-commands"
+import { DeployCommands } from "src/lib/deploy-commands"
 
 export default (client: Client): void => {
 

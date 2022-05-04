@@ -3,7 +3,7 @@ import interactionCreate from "./listeners/interactionCreate";
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds";
 import 'dotenv/config'
-import { DeployCommands } from "./tools/deploy-commands";
+import { DeployCommands } from "./lib/deploy-commands";
 import guildCreate from "./listeners/guildCreate";
 import guildDelete from "./listeners/guildDelete";
 import error from "./listeners/error";
