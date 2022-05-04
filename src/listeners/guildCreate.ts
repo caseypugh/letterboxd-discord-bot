@@ -8,5 +8,8 @@ export default (client: Client): void => {
 
         // Create Slash commands upon joining the server
         await DeployCommands(guild.id)
+
+        // Load latest guilds into cache
+        await client.guilds.fetch()
     })
 }

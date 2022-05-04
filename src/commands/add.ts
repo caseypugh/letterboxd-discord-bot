@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommandInteraction, Client, TextChannel } from "discord.js";
 import delay from "promise-delay-ts";
+import { GuildConfig } from "src/data/config";
 import { User } from "src/data/user";
 import { errorMessageEmbed } from "src/lib/error";
 import { Command } from "./command";
@@ -12,7 +13,7 @@ export const AddUserCommand: Command = {
         .setDescription('Add a Letterboxd user.')
         .addStringOption((option) => option
             .setName(userParam)
-            .setDescription('Enter the Letterboxd username or URL')
+            .setDescription('Enter the Letterboxd username or URL.')
             .setRequired(true)
         ),
 
@@ -58,7 +59,14 @@ export const AddUserCommand: Command = {
             // It's a new user, so post publicly to the channel
             await delay(3000)
 
-            const channel = await client.channels.fetch(process.env.DISCORD_CHANNEL_ID) as TextChannel
+            // const channel = await client.channels.fetch(process.env.DISCORD_CHANNEL_ID) as TextChannel
+            const config = await GuildConfig.findOrCreate(guildId)
+            let channel = interaction.guild.systemChannel
+
+            if (config.channelId) {
+                channel = await interaction.guild.channels.fetch(config.channelId) as TextChannel
+            }
+
             channel.send({
                 content: `Subscribed to new diary entries from ${user.letterboxdUrl}`
             })

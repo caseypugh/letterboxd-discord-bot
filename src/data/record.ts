@@ -1,7 +1,8 @@
+import { GuildConfig } from "./config"
 import { DB, redis } from "./db"
 import { User } from "./user"
 
-export default abstract class KeyvRecord<T extends User> {
+export default abstract class KeyvRecord<T extends User | GuildConfig> {
     // static data: any[]
     public guildId: string
     public loaded: boolean
@@ -11,6 +12,7 @@ export default abstract class KeyvRecord<T extends User> {
         this.guildId = guildId
     }
 
+    abstract get table(): string
     abstract get data(): any // the data you want to store
     abstract onLoad(data: any): void
     abstract onCreate(): void
@@ -18,20 +20,20 @@ export default abstract class KeyvRecord<T extends User> {
 
     public async onBeforeCreate(): Promise<boolean> { return true }
 
-    public static async findAllByGuild<T extends User>(type: { new(g: string): T }, guildId: string): Promise<T[]> {
+    public static async findAllByGuild<T extends User | GuildConfig>(type: { new(g: string): T }, guildId: string): Promise<T[]> {
         const promise = new Promise<T[]>((resolve, reject) => {
             let _items: Promise<T>[] = []
-            console.log(type)
+            const clazz = new type("")
             const stream = redis.scanStream({
-                match: `users:${guildId}*`
+                match: `${clazz.table}:${guildId}*`
             })
 
             stream.on("data", async (resultKeys) => {
                 for (let i = 0; i < resultKeys.length; i++) {
-                    const match = resultKeys[i].match(/users:[0-9]+:(.*)/)
+                    const match = resultKeys[i].match(new RegExp(`${clazz.table}:[0-9]+:(.*)`))
                     if (match) {
-                        let user = KeyvRecord.findByKey<T>(type, match[1], guildId)
-                        _items.push(user)
+                        let item = KeyvRecord.findByKey<T>(type, match[1], guildId)
+                        _items.push(item)
                     }
                 }
             })
@@ -44,24 +46,31 @@ export default abstract class KeyvRecord<T extends User> {
         return promise
     }
 
-    public static async findByKey<T extends User>(type: { new(g: string): T }, key: string, guildId: string): Promise<T> {
+    public static async findByKey<T extends User | GuildConfig>(type: { new(g: string): T }, key: string, guildId: string): Promise<T> {
+        const model = new type(guildId)
+
         if (!key) return null
-        let data = await DB('users', guildId).get(key)
+        let data = await DB(model.table, guildId).get(key)
         if (!data) return null
 
-        const model = new type(guildId)
         model.key = key
         model.loaded = true
         model.onLoad(data)
         return model
     }
 
-    public static async clear(guildId: string): Promise<void> {
-        return await DB('users', guildId).clear()
+    public static async clear<T extends User | GuildConfig>(type: { new(g: string): T },guildId: string): Promise<void> {
+        const model = new type(guildId)
+        return await DB(model.table, guildId).clear()
     }
 
     public async exists(): Promise<boolean> {
-        return (await User.get(this.key, this.guildId)) != null
+        const rsp = await DB(this.table, this.guildId).get(this.key)
+        if (!rsp) {
+            return false
+        }
+
+        return true
     }
 
     public async save(): Promise<boolean> {
@@ -77,17 +86,14 @@ export default abstract class KeyvRecord<T extends User> {
             this.onCreate()
         }
         else {
-            // console.log(`${this._username} updated`)
             this.onUpdate()
         }
 
         this.loaded = true
-        return await DB('users', this.guildId).set(this.key, this.data)
+        return await DB(this.table, this.guildId).set(this.key, this.data)
     }
 
     public async delete(): Promise<boolean> {
-        return await DB('users', this.guildId).delete(this.key)
+        return await DB(this.table, this.guildId).delete(this.key)
     }
-
-
 }

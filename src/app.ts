@@ -30,16 +30,20 @@ client.on("ready", async () => {
     }
 
     // Deploy the latest commands to every guild
-    const guilds = await client.guilds.fetch()
+    // const guilds = await client.guilds.fetch()
+    const guilds = client.guilds.cache
     guilds.forEach(async guild => {
-        console.log(`Deploying commands to ${guild.name} (${guild.id}) ...`)
         DeployCommands(guild.id)
     })
 
     // Run the feed check every minute
     const job = new CronJob({
         cronTime: '0 */1 * * * *',
-        onTick: () => CheckFeeds(client),
+        onTick: async () => {
+            console.log("\n~~~~~~~~~ CronJob starting ~~~~~~~~~")
+            await CheckFeeds(client)
+            console.log("~~~~~~~~~ CronJob finished ~~~~~~~~~")
+        },
         runOnInit: true
     })
     job.start()

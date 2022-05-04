@@ -1,10 +1,13 @@
 import Parser from "rss-parser"
 import { ItemType, parseItem, RSSItem } from "src/lib/rss"
-import { DB, redis } from "src/data/db"
 import fetch from 'node-fetch'
 import KeyvRecord from "./record"
 
 export class User extends KeyvRecord<User> {
+    constructor(guildId: string) {
+        super(guildId)
+    }
+
     public set username(value: string) {
         this.key = User.parseUsername(value)
     }
@@ -17,6 +20,8 @@ export class User extends KeyvRecord<User> {
     public updatedAt: number
     public lastCheckedAt?: number
 
+    public get table(): string { return "users" }
+
     public get data(): any {
         return {
             createdAt: this.createdAt,
@@ -26,7 +31,7 @@ export class User extends KeyvRecord<User> {
     }
 
     public onLoad(data: any): void {
-        console.log('onLoad', this.guildId, this.username, data)
+        // console.log('onLoad', this.guildId, this.username, data)
         this.createdAt = new Date(data.createdAt).getTime()
         this.updatedAt = new Date(data.updatedAt).getTime()
         this.lastCheckedAt = new Date(data.lastCheckedAt).getTime()
@@ -37,7 +42,7 @@ export class User extends KeyvRecord<User> {
     }
 
     public onUpdate(): void {
-        // console.log('onUpdate', this)
+        console.log('onUpdate', this)
     }
 
     public override async onBeforeCreate(): Promise<boolean> {
@@ -70,12 +75,7 @@ export class User extends KeyvRecord<User> {
     public static async get(username: string, guildId: string): Promise<User> {
         const user = new User(guildId)
         user.username = username
-
-        if (!user.username) return null
-        let userData = await DB('users', guildId).get(user.username)
-        if (!userData) return null
-
-        return user
+        return await this.findByKey(User, user.username, guildId)
     }
 
     public static parseUsername(username: string): string {
