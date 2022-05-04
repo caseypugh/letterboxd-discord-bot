@@ -7,7 +7,7 @@ This a simple bot that posts new diary entries from your Letterboxd friends to y
 Use this handy link to add the bot. Or follow the instructions below on how to run it yourself.
 - [**Add to Server**](https://discord.com/api/oauth2/authorize?client_id=839325760501448704&permissions=2112&scope=bot%20applications.commands)
 
-### Commands
+### Slash Commands
 
 - `/add` - Subscribes to a Letterboxd user's new diary entries
 - `/remove` - Unsubscribe a Letterboxd user
@@ -34,7 +34,7 @@ nvm install 16
 nvm use 16
 ```
 
-Data for this bot is stored in Redis. Make sure you ahve a Redis server running.
+Data for this bot is stored in Redis. Make sure you have a Redis server running.
 
 Create an `.env` from the sample file and input your Discord credentials and local Redis server URL
 ```sh
