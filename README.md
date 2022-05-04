@@ -1,16 +1,14 @@
-<center>
-<h2>Letterboxd Discord Bot</h2>
+# Letterboxd Discord Bot
 See what your friends are watching.
-</center>
 
-# Overview
+## Overview
 This a simple bot that posts new diary entries from your Letterboxd friends to your preferred Discord channel.
 
-## Add to your Discord server!
+### Add to your Discord server!
 Use this handy link to add the bot. Or follow the instructions below on how to run it yourself.
 - [**Add to Server**](https://discord.com/api/oauth2/authorize?client_id=839325760501448704&permissions=2112&scope=bot%20applications.commands)
 
-## Commands
+### Commands
 
 - `/add` - Subscribes to a Letterboxd user's new diary entries
 - `/remove` - Unsubscribe a Letterboxd user
@@ -18,10 +16,10 @@ Use this handy link to add the bot. Or follow the instructions below on how to r
 - `/channel` - Update which channel to post to. (Defaults to the system channel)
 
 
-## How it works
+### How it works
 Right now all this bot does is scrape RSS feeds. I'm hoping to get access to Letterboxd API to introduce new functionality.
 
-# How to run the bot yourself
+## How to run the bot yourself
 
 ### Initial setup
 Clone this repo to your computer.
