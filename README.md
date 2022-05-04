@@ -3,7 +3,7 @@
 ## Overview
 This a simple bot that posts new diary entries from your Letterboxd friends to your preferred Discord channel.
 
-### Add to your Discord server!
+## Add to your Discord server!
 Use this handy link to add the bot. Or follow the instructions below on how to run it yourself.
 - [**Add to Server**](https://discord.com/api/oauth2/authorize?client_id=839325760501448704&permissions=2112&scope=bot%20applications.commands)
 
