@@ -1,11 +1,11 @@
 
-import { Client, MessageEmbed, TextChannel } from "discord.js"
-import { User } from "./data/user"
-import delay from "promise-delay-ts"
+import { Client, MessageEmbed, TextChannel } from 'discord.js'
+import { User } from './data/user'
+import delay from 'promise-delay-ts'
 import TimeAgo from 'javascript-time-ago'
 
 import en from 'javascript-time-ago/locale/en.json'
-import { ItemType } from "./lib/rss"
+import { ItemType } from './lib/rss'
 import { GuildConfig } from "./data/config"
 TimeAgo.addDefaultLocale(en)
 const timeAgo = new TimeAgo('en-US')
@@ -22,18 +22,14 @@ export const CheckFeeds = async (client: Client) => {
 
     const guilds = client.guilds.cache
     for (const [key, guild] of guilds) {
+        console.log('Checking guild', guild.name, '....')
 
         const guildConfig = await GuildConfig.findOrCreate(guild.id)
-        if (!guildConfig.channelId) {
-            console.warn(`No channel set for ${guild.name} (${guild.id})`)
-            return
-        }
+        let channel = guild.systemChannel
 
-        let channel = guild.channels.cache.get(guildConfig.channelId) as TextChannel
-
-        if (!channel) {
-            console.warn(`No default channel found for ${guild.name} (${guild.id}). Using system channel`)
-            channel = guild.systemChannel
+        // Use custom channel if set
+        if (guildConfig.channelId) {
+            channel = guild.channels.cache.get(guildConfig.channelId) as TextChannel
         }
 
         const users = await User.allStale(process.env.DISCORD_GUILD_ID)
