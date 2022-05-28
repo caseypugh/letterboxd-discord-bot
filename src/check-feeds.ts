@@ -48,7 +48,11 @@ export const CheckFeeds = async (client: Client) => {
                 console.log('=>', item, message)
 
                 const rewatched = item.rewatch ? 'rewatched' : 'watched'
-                const desc = `[${item.creator}](${user.letterboxdUrl}) ${rewatched}${item.watchedOn != NaN ? ' ' + timeAgo.format(item.watchedOn) : ''}.`
+                let timeAgoStr = ''
+                if (item.watchedOn != null) {
+                    timeAgoStr = ` ${timeAgo.format(item.watchedOn)}.`
+                }
+                const desc = `[${item.creator}](${user.letterboxdUrl}) ${rewatched}${timeAgoStr}.`
 
                 let review = item.type == ItemType.Review ? `\n\n> ${item.review.replace(/\n/mg, '\n\n').replace(/\n/mg, '\n> ')}` : ''
 
