@@ -37,7 +37,9 @@ export function parseItem(item: any): RSSItem {
     _item.rating = parseFloat(item.memberRating)
     _item.pubDate = new Date(Date.parse(item.pubDate))
     _item.rewatch = item.rewatch == 'Yes'
-    _item.watchedOn = new Date(Date.parse(item.watchedDate))
+    if (item.watchedDate) {
+        _item.watchedOn = new Date(Date.parse(item.watchedDate))
+    }
 
     const posterImageMatch = (item.content as string).match(/src="(.+?)"/)
     if (posterImageMatch) {
