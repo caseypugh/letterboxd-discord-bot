@@ -12,7 +12,7 @@ export interface RSSItem {
     rating: number
     link: string
     pubDate: Date
-    watchedOn?: Date | null
+    watchedOn: Date
     creator: string
     guid: string
     posterImageUrl: string
