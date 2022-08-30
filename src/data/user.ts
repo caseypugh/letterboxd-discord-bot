@@ -60,7 +60,12 @@ export class User extends KeyvRecord<User> {
         return KeyvRecord.findAllByGuild<User>(User, guildId)
     }
 
+    /** Return all users who we havent been checked in the last 10 minutes */
     public static async allStale(guildId: string): Promise<User[]> {
+        if (!guildId) {
+            console.error("No guildId passed in")
+        }
+
         const delayBeforeCheck = 60 * 10 * 1000  // 10 minutes
         const users = await User.all(guildId)
 
@@ -134,7 +139,7 @@ export class User extends KeyvRecord<User> {
             return feed
         }
 
-        return feed.filter(item => item.pubDate.getTime() >= this.updatedAt)
+        return feed.filter(item => item.watchedOn.getTime() >= this.updatedAt)
     }
 
 }
