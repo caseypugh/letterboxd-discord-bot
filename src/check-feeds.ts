@@ -32,7 +32,7 @@ export const CheckFeeds = async (client: Client) => {
             channel = guild.channels.cache.get(guildConfig.channelId) as TextChannel
         }
 
-        const users = await User.allStale(process.env.DISCORD_GUILD_ID)
+        const users = await User.allStale(guild.id)
 
         for (let user of users) {
             await delay(500)
