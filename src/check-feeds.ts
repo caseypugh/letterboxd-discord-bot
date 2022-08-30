@@ -51,6 +51,9 @@ export const CheckFeeds = async (client: Client) => {
                 let timeAgoStr = ''
                 if (item.watchedOn != null) {
                     timeAgoStr = ` ${timeAgo.format(item.watchedOn)}`
+                    if (timeAgoStr == " 1 day ago") {
+                        timeAgoStr = " recently"
+                    }
                 }
                 const desc = `[${item.creator}](${user.letterboxdUrl}) ${rewatched}${timeAgoStr}.`
 
