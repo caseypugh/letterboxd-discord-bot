@@ -50,7 +50,7 @@ export const CheckFeeds = async (client: Client) => {
                 const rewatched = item.rewatch ? 'rewatched' : 'watched'
                 let timeAgoStr = ''
                 if (item.watchedOn != null) {
-                    timeAgoStr = ` ${timeAgo.format(item.watchedOn)}.`
+                    timeAgoStr = ` ${timeAgo.format(item.watchedOn)}`
                 }
                 const desc = `[${item.creator}](${user.letterboxdUrl}) ${rewatched}${timeAgoStr}.`
 
