@@ -139,7 +139,7 @@ export class User extends KeyvRecord<User> {
             return feed
         }
 
-        return feed.filter(item => item.watchedOn.getTime() >= this.updatedAt)
+        return feed.filter(item => item.pubDate.getTime() >= this.updatedAt)
     }
 
 }
