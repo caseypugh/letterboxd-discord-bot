@@ -34,19 +34,23 @@ nvm install 16
 nvm use 16
 ```
 
-Data for this bot is stored in Redis. Make sure you have a Redis server running.
-
 Create an `.env` from the sample file and input your Discord credentials and local Redis server URL
 ```sh
 cp .env.sample .env
 ```
 
-
+Data for this bot is stored in Postgresql and uses Prisma as the ORM. Make sure you have a Postgres server running and set the `DATABASE_URL` in your env.
 
 ### Development
 Install latest dependencies
 ```
 yarn install
+```
+
+Run any pending database migrations
+
+```
+yarn db:migrate
 ```
 
 And finally start the dev server

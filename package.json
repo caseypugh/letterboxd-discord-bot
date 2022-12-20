@@ -12,7 +12,6 @@
 	"scripts": {
 		"start": "yarn prisma migrate deploy && yarn db:generate && NODE_PATH=./ ts-node src/app.ts",
 		"dev": "NODE_PATH=./ nodemon --watch \"src/**/*\" --ext ts --exec \"ts-node src/app.ts\"",
-		"redis": "sudo service redis-server start",
 		"deploy-commands": "NODE_PATH=./ ts-node src/tools/deploy-commands.ts",
 		"deploy-heroku": "git push heroku main && heroku logs -t",
 		"test": "ts-node test.ts",
@@ -22,7 +21,6 @@
 	"dependencies": {
 		"@discordjs/builders": "^0.13.0",
 		"@discordjs/rest": "^0.4.1",
-		"@keyv/redis": "^2.3.4",
 		"@prisma/client": "4.7.1",
 		"cron": "^1.8.2",
 		"discord-api-types": "^0.32.0",
