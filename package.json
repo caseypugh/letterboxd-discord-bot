@@ -10,7 +10,7 @@
 		"node": "16"
 	},
 	"scripts": {
-		"start": "yarn db:migrate && yarn db:generate && NODE_PATH=./ ts-node src/app.ts",
+		"start": "yarn prisma migrate deploy && yarn db:generate && NODE_PATH=./ ts-node src/app.ts",
 		"dev": "NODE_PATH=./ nodemon --watch \"src/**/*\" --ext ts --exec \"ts-node src/app.ts\"",
 		"redis": "sudo service redis-server start",
 		"deploy-commands": "NODE_PATH=./ ts-node src/tools/deploy-commands.ts",
