@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int         @id @default(autoincrement())
+  username      String
+  guildId       String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  lastCheckedAt DateTime?
+  guild         GuildConfig @relation(fields: [guildId], references: [guildId])
+
+  @@unique([username, guildId], name: "userIdentifier")
+}
+
+model GuildConfig {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  channelId String?
+  users     User[]
+}
