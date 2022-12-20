@@ -1,30 +1,21 @@
 {
-  "compilerOptions": {
-    "target": "ES6",
-    "baseUrl": "./",
-    "allowJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
-    "skipLibCheck": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "noEmit": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": false,
-    "jsx": "preserve"
-  },
-  "include": [
-    "**/*/*.ts",
-    "**/*/*.js",
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+	"compilerOptions": {
+		"target": "ES6",
+		"baseUrl": "./",
+		"allowJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"noImplicitAny": false,
+		"strictNullChecks": true,
+		"skipLibCheck": true,
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"noEmit": true,
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"isolatedModules": false,
+		"jsx": "preserve"
+	},
+	"include": ["**/*/*.ts", "**/*/*.js"],
+	"exclude": ["node_modules"]
 }
