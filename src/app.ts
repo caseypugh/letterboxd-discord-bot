@@ -9,11 +9,7 @@ import error from "./listeners/error"
 import "dotenv/config"
 
 console.log("Letterboxd is starting...")
-const permissions =
-	Permissions.FLAGS.SEND_MESSAGES |
-	// Permissions.FLAGS.SEND_MESSAGES_IN_THREADS |
-	// Permissions.FLAGS.USE_EXTERNAL_EMOJIS |
-	Permissions.FLAGS.ADD_REACTIONS
+const permissions =	Permissions.FLAGS.SEND_MESSAGES 
 
 const scopes: InviteScope[] = ["bot", "applications.commands"]
 
@@ -24,7 +20,7 @@ console.log(
 )
 
 const client = new Client({
-	intents: ["GUILDS", "GUILD_EMOJIS_AND_STICKERS"],
+	intents: ["GUILDS"],
 })
 
 client.on("ready", async () => {
