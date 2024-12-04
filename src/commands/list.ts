@@ -2,7 +2,6 @@ import { SlashCommandBuilder } from "@discordjs/builders"
 import { BaseCommandInteraction, Client, MessageEmbed } from "discord.js"
 import { Command } from "./command"
 import prisma from "src/lib/prisma"
-import { Users } from "src/models/user"
 import { letterboxdUrl } from "src/lib/letterboxd"
 
 export const ListUsersCommand: Command = {
