@@ -4,8 +4,13 @@
 This a simple bot that posts new diary entries from your Letterboxd friends to your preferred Discord channel.
 
 ## Add to your Discord server!
-Use this handy link to add the bot. Or follow the instructions below on how to run it yourself.
+Use this handy link to add the bot. 
+
+_NOTE: Add at your own risk! I have no intentions of maintaining this hosted bot and could likely shut down in the near future. If you'd like to use something more reliable check out the [Filmlinkd](https://jimlind.github.io/filmlinkd/) bot._
+
 - [**Add to Server**](https://discord.com/api/oauth2/authorize?client_id=839325760501448704&permissions=2112&scope=bot%20applications.commands)
+
+Or follow the instructions below on how to host the bot yourself.
 
 ### Slash Commands
 
@@ -16,7 +21,7 @@ Use this handy link to add the bot. Or follow the instructions below on how to r
 
 
 ### How it works
-Right now all this bot does is scrape RSS feeds. I'm hoping to get access to Letterboxd API to introduce new functionality.
+Right now all this bot does is scrape RSS feeds to find the latest entry. I'm hoping to get access to Letterboxd API to introduce new functionality. If you are looking for more features, check out [Filmlinkd](https://jimlind.github.io/filmlinkd/). 
 
 ## How to run the bot yourself
 
