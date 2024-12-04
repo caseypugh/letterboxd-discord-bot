@@ -7,7 +7,7 @@
 	"author": "Casey Pugh",
 	"license": "MIT",
 	"engines": {
-		"node": "16"
+		"node": "18"
 	},
 	"scripts": {
 		"start": "yarn prisma migrate deploy && yarn db:generate && NODE_PATH=./ ts-node src/app.ts",
