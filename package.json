@@ -26,7 +26,6 @@
 		"discord-api-types": "^0.32.0",
 		"discord.js": "^13.6.0",
 		"dotenv": "^17.4.2",
-		"javascript-time-ago": "^2.3.13",
 		"node-fetch": "2",
 		"promise-delay-ts": "^1.0.1",
 		"rss-parser": "^3.12.0",

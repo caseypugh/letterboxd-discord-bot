@@ -1,14 +1,18 @@
 import { Client, MessageEmbed, TextChannel } from "discord.js"
 import delay from "promise-delay-ts"
-import TimeAgo from "javascript-time-ago"
-import en from "javascript-time-ago/locale/en.json"
 import { ItemType } from "./lib/rss"
 import prisma from "./lib/prisma"
 import { Users } from "./models/user"
 import { getLatestDiaryEntries, letterboxdRssUrl, letterboxdUrl } from "./lib/letterboxd"
 
-TimeAgo.addDefaultLocale(en)
-const timeAgo = new TimeAgo("en-US")
+// watchedOn from Letterboxd is a calendar date with no time/timezone; compare
+// in whole UTC days so the displayed string doesn't drift with server time.
+function daysSinceWatched(watchedOn: Date): number {
+	const now = new Date()
+	const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+	const watchedUtc = Date.UTC(watchedOn.getUTCFullYear(), watchedOn.getUTCMonth(), watchedOn.getUTCDate())
+	return Math.floor((todayUtc - watchedUtc) / 86400000)
+}
 
 let processing: boolean = false
 export const CheckFeeds = async (client: Client) => {
@@ -61,9 +65,13 @@ export const CheckFeeds = async (client: Client) => {
 				const rewatched = item.rewatch ? "rewatched" : "watched"
 				let timeAgoStr = ""
 				if (item.watchedOn != null) {
-					timeAgoStr = ` ${timeAgo.format(item.watchedOn)}`
-					if (timeAgoStr == " 1 day ago") {
-						timeAgoStr = " recently"
+					const days = daysSinceWatched(item.watchedOn)
+					if (days <= 0) {
+						timeAgoStr = " today"
+					} else if (days === 1) {
+						timeAgoStr = " yesterday"
+					} else {
+						timeAgoStr = ` ${days} days ago`
 					}
 				}
 				const desc = `[${item.creator}](${letterboxdUrl(user)}) ${rewatched}${timeAgoStr}.`
