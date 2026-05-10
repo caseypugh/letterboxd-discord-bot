@@ -48,7 +48,7 @@ export const CheckFeeds = async (client: Client) => {
 		const users = await Users(prisma).allStale(guild.id)
 
 		for (let user of users) {
-			await delay(500)
+			await delay(250)
 			let items
 			try {
 				items = await getLatestDiaryEntries(user)
