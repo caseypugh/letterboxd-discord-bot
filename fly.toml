@@ -1,8 +1,16 @@
-app = "letterboxd-discord-bot"
-primary_region = "ord"
+# fly.toml app configuration file
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+# This bot is a worker (Discord gateway + cron loop). It does not serve HTTP,
+# so there is no [http_service] block — that would let Fly auto-stop the VM
+# when no traffic arrives. The machine should stay running 24/7.
+
+app = 'letterboxd-discord-bot'
+primary_region = 'ord'
 
 [build]
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "512mb"
+  size = 'shared-cpu-1x'
+  memory = '512mb'
