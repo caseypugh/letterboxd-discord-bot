@@ -37,7 +37,7 @@ client.on("ready", async () => {
 	})
 
 	// Run the feed check every minute
-	const job = new CronJob({
+	const job = CronJob.from({
 		cronTime: "0 */1 * * * *",
 		onTick: async () => {
 			console.log("\n~~~~~~~~~ CronJob starting ~~~~~~~~~")

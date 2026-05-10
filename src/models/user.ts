@@ -1,7 +1,7 @@
 /**
  * WIP class... ideally all API logic could be thrown into here which the API and SSG both leverage
  */
-import { prisma, Prisma, PrismaClient, User } from "@prisma/client"
+import { PrismaClient, User } from "@prisma/client"
 
 export function Users(prisma: PrismaClient) {
 	return Object.assign(prisma, {
