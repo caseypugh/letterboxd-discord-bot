@@ -3,3 +3,4 @@ node_modules/
 config.json
 yarn-error.log
 data/*
+.DS_Store
