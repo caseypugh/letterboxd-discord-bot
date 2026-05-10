@@ -39,27 +39,67 @@ nvm install 24
 nvm use 24
 ```
 
-Create an `.env` from the sample file and input your Discord credentials and local Redis server URL
+Create an `.env` from the sample file and fill in your Discord credentials.
 ```sh
 cp .env.sample .env
 ```
 
-Data for this bot is stored in Postgresql and uses Prisma as the ORM. Make sure you have a Postgres server running and set the `DATABASE_URL` in your env.
+Data is stored in Postgres via Prisma. The repo includes a `docker-compose.yml` for local development — start it with:
+
+```sh
+docker compose up -d
+```
+
+This runs Postgres 17 on `localhost:5432` with the credentials already wired into `.env.sample`. To stop it: `docker compose down`. Data persists in a Docker volume between restarts.
+
+If you'd rather use a Postgres install of your own, just update `DATABASE_URL` in `.env`.
 
 ### Development
-Install latest dependencies
+
+Install dependencies once:
 ```
 yarn install
 ```
 
-Run any pending database migrations
-
-```
-yarn db:migrate
-```
-
-And finally start the dev server
+Then bring up the whole dev environment with one command:
 ```sh
-# Suports hot reloading
-yarn dev
+yarn up
 ```
+
+This starts the local Postgres container (waits for it to be healthy), applies any pending migrations, and runs the bot with hot reload.
+
+If you'd rather run the pieces separately:
+```sh
+docker compose up -d   # start Postgres
+yarn db:migrate        # apply migrations
+yarn dev               # run the bot
+```
+
+## Deployment
+
+The bot is a long-running worker (Discord gateway + a 1-minute cron loop). It needs an always-on host plus a Postgres database. A `Dockerfile` is included so you can deploy to any container platform.
+
+### Recommended: Fly.io + Neon (~$0–5/mo)
+
+1. **Create a Postgres database on [Neon](https://neon.tech)** and copy the connection string.
+2. **Install [`flyctl`](https://fly.io/docs/flyctl/install/)** and run `fly launch --no-deploy --copy-config` from the repo root. If the app name `letterboxd-discord-bot` is taken, Fly will prompt you for a different one — update `fly.toml` to match.
+3. **Set secrets:**
+   ```sh
+   fly secrets set \
+     DISCORD_CLIENT_ID=... \
+     DISCORD_TOKEN=... \
+     DATABASE_URL='postgresql://...neon.tech/...?sslmode=require'
+   ```
+4. **Deploy:** `fly deploy`
+
+### Auto-deploy via GitHub Actions
+
+A workflow at `.github/workflows/deploy.yml` deploys to Fly on every push to `main`. To use it on your fork:
+
+1. Run `fly tokens create deploy` and copy the token.
+2. Add it to your repo's secrets as `FLY_API_TOKEN` (Settings → Secrets and variables → Actions).
+3. Push to `main`.
+
+### Other platforms
+
+The included `Dockerfile` works on any container host — Railway, Render, DigitalOcean, a VPS, etc. The bot needs three env vars: `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, `DATABASE_URL` (Postgres).
