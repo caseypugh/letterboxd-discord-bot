@@ -3,7 +3,7 @@ import delay from "promise-delay-ts"
 import { ItemType } from "./lib/rss"
 import prisma from "./lib/prisma"
 import { Users } from "./models/user"
-import { getLatestDiaryEntries, letterboxdRssUrl, letterboxdUrl } from "./lib/letterboxd"
+import { getLatestDiaryEntries, LetterboxdUserNotFoundError, letterboxdRssUrl, letterboxdUrl } from "./lib/letterboxd"
 
 // watchedOn from Letterboxd is a calendar date with no time/timezone; compare
 // in whole UTC days so the displayed string doesn't drift with server time.
@@ -49,7 +49,17 @@ export const CheckFeeds = async (client: Client) => {
 
 		for (let user of users) {
 			await delay(500)
-			const items = await getLatestDiaryEntries(user)
+			let items
+			try {
+				items = await getLatestDiaryEntries(user)
+			} catch (e) {
+				if (e instanceof LetterboxdUserNotFoundError) {
+					console.warn(`Letterboxd user ${user.username} returned 404, deleting`)
+					await prisma.user.delete({ where: { id: user.id } })
+					continue
+				}
+				throw e
+			}
 
 			await prisma.user.update({
 				where: { id: user.id },

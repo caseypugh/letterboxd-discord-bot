@@ -3,6 +3,8 @@ import Parser from "rss-parser"
 import { ItemType, parseItem, RSSItem } from "src/lib/rss"
 import fetch from "node-fetch"
 
+export class LetterboxdUserNotFoundError extends Error {}
+
 export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 	console.log(`Fetching RSS feed for ${user.username} - ${letterboxdRssUrl(user)}`)
 	const parser = new Parser({
@@ -24,6 +26,9 @@ export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 			.map((i) => parseItem(i))
 			.filter((i) => i.type == ItemType.Review || i.type == ItemType.Watch)
 	} catch (e) {
+		if (e instanceof Error && e.message === "Status code 404") {
+			throw new LetterboxdUserNotFoundError(user.username)
+		}
 		console.error(e)
 		return feed
 	}
