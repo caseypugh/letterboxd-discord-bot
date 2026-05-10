@@ -33,10 +33,10 @@ git clone git@github.com:caseypugh/letterboxd-discord-bot.git
 cd letterboxd-discord-bot
 ```
 
-Make sure your have Node 16 installed. If you're using `nvm`...
+Make sure you have Node 24 installed. If you're using `nvm`...
 ```
-nvm install 16
-nvm use 16
+nvm install 24
+nvm use 24
 ```
 
 Create an `.env` from the sample file and input your Discord credentials and local Redis server URL
