@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 - `yarn dev` — run the bot locally with hot reload (nodemon + ts-node, watches `src/**/*.ts`).
-- `yarn start` — production entry; runs `prisma migrate deploy`, `prisma generate`, then `ts-node src/app.ts`. Used by the Heroku `worker` process (`Procfile`).
+- `yarn start` — production entry; runs `prisma migrate deploy`, `prisma generate`, then `ts-node src/app.ts`. Used as the container `CMD` in the included `Dockerfile`.
 - `yarn db:migrate` — `prisma migrate dev` against `DATABASE_URL`.
 - `yarn db:generate` — regenerate the Prisma client (run after editing `prisma/schema.prisma`).
 - `yarn deploy-commands` — script entry to push slash command definitions; note that in normal operation `app.ts` already deploys commands to every guild on `ready` and on `guildCreate`, so manual invocation is rarely needed.
@@ -13,7 +13,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Required env vars (`.env`, see `.env.sample`): `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, `DATABASE_URL` (Postgres). `ENV=dev` is read in `lib/deploy-commands.ts` but currently no-op.
 
-Node 18 (see `engines` in `package.json`). The README still says Node 16 — `package.json` is authoritative.
+Node 24 (see `engines` in `package.json` and `.nvmrc`).
+
+**Deployment:** the repo ships a `Dockerfile` and a `fly.toml` configured as a worker (no HTTP service). `.github/workflows/deploy.yml` deploys to Fly on push to `main` via the `FLY_API_TOKEN` secret. Postgres is expected to be external (Neon recommended); set `DATABASE_URL` via `fly secrets set`.
 
 ## Architecture
 

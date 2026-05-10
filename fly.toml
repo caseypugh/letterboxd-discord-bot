@@ -1,0 +1,8 @@
+app = "letterboxd-discord-bot"
+primary_region = "ord"
+
+[build]
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
