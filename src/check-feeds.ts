@@ -95,7 +95,7 @@ export const CheckFeeds = async (client: Client) => {
 					.setURL(item.link)
 					.setThumbnail(item.posterImageUrl)
 					.setDescription(desc + review)
-					.setColor("#FF7E02")
+					.setColor(item.rewatch ? "#00E054" : "#FF7E02")
 
 				await channel?.send({
 					embeds: [embed],
