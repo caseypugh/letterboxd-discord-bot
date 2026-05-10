@@ -8,6 +8,7 @@ export class LetterboxdUserNotFoundError extends Error {}
 export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 	console.log(`Fetching RSS feed for ${user.username} - ${letterboxdRssUrl(user)}`)
 	const parser = new Parser({
+		headers: { "User-Agent": "letterboxd-discord-bot/1.0" },
 		customFields: {
 			item: [
 				["letterboxd:rewatch", "rewatch"],
