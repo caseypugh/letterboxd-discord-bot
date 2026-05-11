@@ -1,4 +1,4 @@
-import { Client, MessageEmbed, TextChannel } from "discord.js"
+import { Client, Guild, MessageEmbed, TextChannel } from "discord.js"
 import delay from "promise-delay-ts"
 import { ItemType } from "./lib/rss"
 import prisma from "./lib/prisma"
@@ -12,6 +12,26 @@ function daysSinceWatched(watchedOn: Date): number {
 	const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
 	const watchedUtc = Date.UTC(watchedOn.getUTCFullYear(), watchedOn.getUTCMonth(), watchedOn.getUTCDate())
 	return Math.floor((todayUtc - watchedUtc) / 86400000)
+}
+
+// Resolve a channel we can actually post to. Try the admin-configured channel
+// first; on perm failure or missing channel, fall back to systemChannel so a
+// broken `/channel` config can't silently disable the guild.
+function pickChannel(guild: Guild, configuredId: string | null): TextChannel | null {
+	const me = guild.me ?? guild.client.user!.id
+	const usable = (id: string): TextChannel | null => {
+		const ch = guild.channels.cache.get(id)
+		if (!ch || !ch.isText()) return null
+		const perms = ch.permissionsFor(me)
+		if (!perms?.has(["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"])) return null
+		return ch as TextChannel
+	}
+	if (configuredId) {
+		const ch = usable(configuredId)
+		if (ch) return ch
+		console.warn(`Guild ${guild.name} (${guild.id}): configured channel ${configuredId} not usable, falling back to systemChannel`)
+	}
+	return guild.systemChannel ? usable(guild.systemChannel.id) : null
 }
 
 let processing: boolean = false
@@ -39,26 +59,28 @@ export const CheckFeeds = async (client: Client) => {
 			})
 		}
 
-		let channel = guild.systemChannel
-
-		// Use custom channel if set
-		if (guildConfig.channelId) {
-			channel = guild.channels.cache.get(guildConfig.channelId) as TextChannel
-		}
-
-		if (!channel) {
-			console.warn(`Skipping guild ${guild.name} (${guild.id}): no usable channel configured`)
-			continue
-		}
-
 		// Skip without advancing lastCheckedAt so entries backfill once perms are fixed.
-		const perms = channel.permissionsFor(guild.me ?? client.user!.id)
-		if (!perms?.has(["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"])) {
-			console.warn(`Skipping guild ${guild.name} (${guild.id}): missing perms in #${channel.name}`)
+		const channel = pickChannel(guild, guildConfig.channelId)
+		if (!channel) {
+			console.warn(`Skipping guild ${guild.name} (${guild.id}): no usable channel`)
 			continue
 		}
 
 		const users = await Users(prisma).allStale(guild.id)
+
+		// systemChannel fallback: advance lastCheckedAt without posting so we don't dump
+		// a long backlog into a channel the admin didn't choose. Acts like a fresh subscription.
+		const usingFallback = !!guildConfig.channelId && channel.id !== guildConfig.channelId
+		if (usingFallback) {
+			if (users.length > 0) {
+				await prisma.user.updateMany({
+					where: { id: { in: users.map((u) => u.id) } },
+					data: { lastCheckedAt: new Date() },
+				})
+			}
+			console.warn(`Guild ${guild.name}: systemChannel fallback, advanced ${users.length} user(s) without posting backlog`)
+			continue
+		}
 
 		for (let user of users) {
 			await delay(250)
