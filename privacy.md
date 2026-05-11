@@ -1,42 +1,62 @@
 # Privacy Policy
-Effective Date: December 1, 2024
+Effective Date: May 11, 2026
 
 ### 1. Introduction
-This Privacy Policy explains how Casey Pugh ("we," "us," or "our") collects, uses, and protects your information when you use the Letterboxd Discord Bot ("the Bot").
+This Privacy Policy explains what information the Letterboxd Discord Bot ("the Bot") collects, how it is used, and how it is stored. The Bot is operated by Casey Pugh ("we," "us," or "our").
 
 ### 2. Information We Collect
-Discord Information: We may collect your Discord username and Discord ID solely to provide the Bot's services.
+The Bot stores the minimum information required to poll Letterboxd RSS feeds and post diary entries to the correct Discord channel:
 
-Debugging Data: We may collect minimal usage data and error logs for debugging purposes to improve the Bot's performance.
+- **Letterboxd usernames** that have been added to the Bot via the `/add` slash command.
+- **Discord server (guild) IDs** for the servers the Bot has been added to.
+- **Discord channel IDs** when a server administrator configures a destination channel via `/channel`.
+- **Timestamps** (`createdAt`, `updatedAt`, `lastCheckedAt`) used to determine which Letterboxd entries are new since the last poll.
+
+The Bot does **not** collect or store Discord usernames, Discord user IDs, message contents, member lists, presence data, voice data, or any direct messages. The Bot operates with only the `GUILDS` gateway intent.
+
+In addition, when an error occurs, anonymous error reports (stack traces and runtime context) may be sent to [Sentry](https://sentry.io) for debugging. These error reports do not contain personal data beyond what may incidentally appear in an error message (e.g., a Letterboxd username that triggered a parsing error).
 
 ### 3. How We Use Your Information
+The information above is used solely to:
 
-Provide Services: To operate and maintain the Bot, including responding to your requests.
+- Fetch the public Letterboxd RSS feed (`letterboxd.com/<username>/rss/`) for each added username on a recurring schedule.
+- Post new diary entries to the configured Discord channel for the corresponding server.
+- Diagnose and fix bugs in the Bot.
 
-Debugging: To identify and fix issues to enhance the Bot’s functionality.
-No Tracking or Analysis: We do not track or analyze your data beyond what is necessary for debugging.
+We do not perform analytics, profiling, advertising, or any form of behavioural tracking.
 
-### 4. Data Sharing and Disclosure
-No Reselling of Data: We will never resell your personal information to third parties.
+### 4. Where Your Information Is Stored
+- **Database:** A PostgreSQL database hosted by [Neon](https://neon.tech).
+- **Application hosting:** [Fly.io](https://fly.io).
+- **Error monitoring:** [Sentry](https://sentry.io), only when error reporting is enabled.
+- **Letterboxd:** Public RSS feeds at letterboxd.com are accessed over HTTPS; no credentials or personal data are sent to Letterboxd.
 
-Third-Party Services: We do not share your personal information with third parties except as necessary to provide the Bot's functionality (e.g., Discord).
+We do not sell, rent, or otherwise share your information with any other third parties.
 
-Legal Requirements: We may disclose your information if required by law or to protect our rights.
+### 5. Data Retention and Deletion
+Your information is retained only for as long as it is needed to operate the Bot. It is deleted automatically in the following cases:
 
-### 5. Data Security
-We implement reasonable security measures to protect your information from unauthorized access, alteration, disclosure, or destruction.
+- A server administrator runs `/remove <username>` — that user's row is deleted from the database immediately.
+- The Bot is removed from a Discord server — the `guildDelete` event handler hard-deletes every `User` and `GuildConfig` row for that server. There is no soft delete or backup retention.
 
-### 6. Data Retention
-We retain your information only for as long as necessary to provide the Bot's services and comply with legal obligations.
+If you would like your information deleted manually, or have any other privacy-related request, please open an issue at <https://github.com/caseypugh/letterboxd-discord-bot/issues>.
+
+### 6. Data Security
+Information is transmitted over HTTPS and stored on managed infrastructure providers (Neon, Fly.io) that implement industry-standard security controls. No method of transmission or storage is 100% secure, and we cannot guarantee absolute security.
 
 ### 7. Your Rights
-Depending on your jurisdiction, you may have the right to access, correct, or delete your personal information. To exercise these rights, please contact us at [your contact email].
+Depending on your jurisdiction, you may have rights to access, correct, or delete the information the Bot stores about you or your server. Because the only information we store is your Letterboxd username (or your server's ID and channel ID), you can exercise these rights at any time by:
+
+- Running `/list` to see which Letterboxd usernames are tracked in your server.
+- Running `/remove <username>` to delete a tracked user.
+- Removing the Bot from your server to delete all associated data.
+- Filing a GitHub issue using the link in Section 9.
 
 ### 8. Open Source Transparency
-Since the Bot is open-source, the source code is publicly available on GitHub. This transparency allows users to review how data is handled and ensure compliance with privacy standards.
+The Bot is open source. The full source code, including every place data is read or written, is publicly available at <https://github.com/caseypugh/letterboxd-discord-bot>.
 
-### 9. Changes to This Privacy Policy
+### 9. Contact Us
+For any questions or requests regarding this Privacy Policy, please open an issue at <https://github.com/caseypugh/letterboxd-discord-bot/issues>.
+
+### 10. Changes to This Privacy Policy
 We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated effective date. Continued use of the Bot constitutes acceptance of the revised Privacy Policy.
-
-### 10. Contact Us
-If you have any questions about this Privacy Policy, please file a GitHub issue.

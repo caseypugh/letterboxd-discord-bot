@@ -1,5 +1,5 @@
 # Terms of Service
-Effective Date: December 1, 2024
+Effective Date: May 11, 2026
 
 ### 1. Acceptance of Terms
 
@@ -17,7 +17,7 @@ Account Security: If an account is required, users are responsible for maintaini
 
 ### 4. Intellectual Property
 
-All content and functionality of the Bot, including but not limited to text, graphics, logos, and software, are the property of [Your Name or Company] and are protected by applicable intellectual property laws.
+All content and functionality of the Bot, including but not limited to text, graphics, logos, and software, are the property of Casey Pugh and are protected by applicable intellectual property laws.
 
 ### 5. Open Source
 
@@ -25,9 +25,9 @@ The Bot is open-source and available on GitHub. Users are encouraged to contribu
 
 ### 6. Data Usage
 
-No Data Tracking or Analysis: We do not engage in any data tracking or analysis of user interactions beyond what is necessary for debugging purposes.
+The Bot stores a small amount of information (Letterboxd usernames added via `/add`, Discord server IDs, and the configured channel ID per server) to operate. We do not engage in analytics, behavioural tracking, or profiling, and we never sell or share your data with third parties beyond the infrastructure providers required to run the Bot.
 
-No Reselling of Data: We will never resell your data to third parties.
+For full details about what is collected, where it is stored, and how to request deletion, see the [Privacy Policy](./privacy.md).
 
 ### 7. Limitation of Liability
 
