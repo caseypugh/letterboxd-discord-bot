@@ -47,6 +47,13 @@ export const AddUserCommand: Command = {
 			return
 		}
 
+		// User.guildId has an FK to GuildConfig.guildId, so ensure the parent row
+		// exists before inserting the user — otherwise /add crashes the process.
+		let config = await prisma.guildConfig.findFirst({ where: { guildId } })
+		if (!config) {
+			config = await prisma.guildConfig.create({ data: { guildId } })
+		}
+
 		// let user = await User.get(username, guildId)
 		let user = await prisma.user.findFirst({ where: { username, guildId } })
 
@@ -69,13 +76,6 @@ export const AddUserCommand: Command = {
 
 			// It's a new user, so post publicly to the channel
 			await delay(3000)
-
-			// const channel = await client.channels.fetch(process.env.DISCORD_CHANNEL_ID) as TextChannel
-			// const config = await GuildConfig.findOrCreate(guildId)
-			let config = await prisma.guildConfig.findFirst({ where: { guildId } })
-			if (!config) {
-				config = await prisma.guildConfig.create({ data: { guildId } })
-			}
 
 			let channel = interaction.guild?.systemChannel
 
