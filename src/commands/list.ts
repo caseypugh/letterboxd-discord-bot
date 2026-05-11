@@ -22,12 +22,12 @@ export const ListUsersCommand: Command = {
 
 		const guildId = interaction.guildId
 
-		let content = ""
-
 		const users = await prisma.user.findMany({
 			where: { guildId },
 			orderBy: { username: "asc" },
 		})
+
+		let content = users.length === 0 ? "No users added yet. Use `/add` to add one." : ""
 
 		for await (let user of users) {
 			content += `- [${user.username}](${letterboxdUrl(user)})\n`
