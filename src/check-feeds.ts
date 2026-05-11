@@ -1,5 +1,6 @@
 import { Client, Guild, MessageEmbed, TextChannel } from "discord.js"
 import delay from "promise-delay-ts"
+import * as Sentry from "@sentry/node"
 import { ItemType } from "./lib/rss"
 import prisma from "./lib/prisma"
 import { Users } from "./models/user"
@@ -93,7 +94,13 @@ export const CheckFeeds = async (client: Client) => {
 					await prisma.user.delete({ where: { id: user.id } })
 					continue
 				}
-				throw e
+				Sentry.withScope((scope) => {
+					scope.setTag("guildId", guild.id)
+					scope.setContext("user", { id: user.id, username: user.username })
+					Sentry.captureException(e)
+				})
+				console.error(`Failed to fetch feed for ${user.username}:`, e)
+				continue
 			}
 
 			await prisma.user.update({

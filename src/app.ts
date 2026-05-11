@@ -1,3 +1,5 @@
+import "./instrument"
+import * as Sentry from "@sentry/node"
 import { Client, Permissions, InviteScope } from "discord.js"
 import interactionCreate from "./listeners/interactionCreate"
 import { CronJob } from "cron"
@@ -41,7 +43,12 @@ client.on("ready", async () => {
 		cronTime: "0 */1 * * * *",
 		onTick: async () => {
 			console.log("\n~~~~~~~~~ CronJob starting ~~~~~~~~~")
-			await CheckFeeds(client)
+			try {
+				await CheckFeeds(client)
+			} catch (e) {
+				Sentry.captureException(e)
+				console.error(e)
+			}
 			console.log("~~~~~~~~~ CronJob finished ~~~~~~~~~")
 		},
 		runOnInit: true,

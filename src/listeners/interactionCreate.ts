@@ -1,10 +1,23 @@
 import { BaseCommandInteraction, Client, Interaction } from "discord.js"
+import * as Sentry from "@sentry/node"
 import { Commands } from "../commands/command"
 
 export default (client: Client): void => {
 	client.on("interactionCreate", async (interaction: Interaction) => {
 		if (interaction.isCommand() || interaction.isContextMenu()) {
-			await handleSlashCommand(client, interaction)
+			try {
+				await handleSlashCommand(client, interaction)
+			} catch (e) {
+				Sentry.withScope((scope) => {
+					scope.setTag("command", interaction.commandName)
+					scope.setContext("interaction", {
+						guildId: interaction.guildId ?? undefined,
+						userId: interaction.user.id,
+					})
+					Sentry.captureException(e)
+				})
+				console.error(e)
+			}
 		}
 	})
 }
@@ -18,5 +31,5 @@ const handleSlashCommand = async (client: Client, interaction: BaseCommandIntera
 		return
 	}
 
-	slashCommand.run(client, interaction)
+	await slashCommand.run(client, interaction)
 }

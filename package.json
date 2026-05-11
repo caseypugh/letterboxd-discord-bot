@@ -22,6 +22,7 @@
 		"@discordjs/builders": "^0.13.0",
 		"@discordjs/rest": "^0.4.1",
 		"@prisma/client": "^6.19.3",
+		"@sentry/node": "^10.52.0",
 		"cron": "^4.4.0",
 		"discord-api-types": "^0.32.0",
 		"discord.js": "^13.6.0",
