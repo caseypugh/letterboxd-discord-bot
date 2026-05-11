@@ -24,8 +24,9 @@ export const CheckFeeds = async (client: Client) => {
 	// console.log("\nChecking feeds ...");
 	processing = true
 
-	const guilds = client.guilds.cache
-	for (const [key, guild] of guilds) {
+	try {
+		const guilds = client.guilds.cache
+		for (const [key, guild] of guilds) {
 		console.log("Checking guild", guild.name, "....")
 
 		let guildConfig = await prisma.guildConfig.findFirst({
@@ -43,6 +44,18 @@ export const CheckFeeds = async (client: Client) => {
 		// Use custom channel if set
 		if (guildConfig.channelId) {
 			channel = guild.channels.cache.get(guildConfig.channelId) as TextChannel
+		}
+
+		if (!channel) {
+			console.warn(`Skipping guild ${guild.name} (${guild.id}): no usable channel configured`)
+			continue
+		}
+
+		// Skip without advancing lastCheckedAt so entries backfill once perms are fixed.
+		const perms = channel.permissionsFor(guild.me ?? client.user!.id)
+		if (!perms?.has(["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"])) {
+			console.warn(`Skipping guild ${guild.name} (${guild.id}): missing perms in #${channel.name}`)
+			continue
 		}
 
 		const users = await Users(prisma).allStale(guild.id)
@@ -117,7 +130,8 @@ export const CheckFeeds = async (client: Client) => {
 				})
 			}
 		}
+		}
+	} finally {
+		processing = false
 	}
-
-	processing = false
 }
