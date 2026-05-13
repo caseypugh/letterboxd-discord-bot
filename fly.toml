@@ -12,5 +12,5 @@ primary_region = 'ord'
 [build]
 
 [[vm]]
-  size = 'shared-cpu-1x'
-  memory = '512mb'
+size = 'shared-cpu-1x'
+memory = '768mb'
