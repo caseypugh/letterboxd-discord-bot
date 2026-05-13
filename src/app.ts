@@ -4,7 +4,6 @@ import { Client, Permissions, InviteScope } from "discord.js"
 import interactionCreate from "./listeners/interactionCreate"
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds"
-import { DeployCommands } from "./lib/deploy-commands"
 import guildCreate from "./listeners/guildCreate"
 import guildDelete from "./listeners/guildDelete"
 import error from "./listeners/error"
@@ -31,12 +30,6 @@ client.on("ready", async () => {
 	if (!client.user || !client.application) {
 		return
 	}
-
-	// Deploy the latest commands to every guild
-	const guilds = await client.guilds.fetch()
-	guilds.forEach(async (guild) => {
-		DeployCommands(guild.id)
-	})
 
 	// Run the feed check every minute
 	const job = CronJob.from({
