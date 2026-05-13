@@ -12,6 +12,7 @@
 	"scripts": {
 		"start": "yarn prisma migrate deploy && yarn db:generate && NODE_PATH=./ ts-node src/app.ts",
 		"up": "docker compose up -d --wait && yarn db:migrate && yarn dev",
+		"down": "docker compose down",
 		"dev": "NODE_PATH=./ nodemon --watch \"src/**/*\" --ext ts --exec \"ts-node src/app.ts\"",
 		"deploy-commands": "NODE_PATH=./ ts-node src/tools/deploy-commands.ts",
 		"test": "ts-node test.ts",
