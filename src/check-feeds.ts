@@ -115,51 +115,62 @@ export const CheckFeeds = async (client: Client) => {
 				for await (const item of items) {
 					// Format and post new items to the Discord channel
 					await delay(1000)
-					console.log(`=> ${item.creator} watched ${item.filmTitle} ${item.link}`)
+					try {
+						console.log(`=> ${item.creator} watched ${item.filmTitle} ${item.link}`)
 
-					const rewatched = item.rewatch ? "rewatched" : "watched"
-					let timeAgoStr = ""
-					if (item.watchedOn != null) {
-						const days = daysSinceWatched(item.watchedOn)
-						if (days <= 0) {
-							timeAgoStr = " today"
-						} else if (days === 1) {
-							timeAgoStr = " yesterday"
-						} else {
-							timeAgoStr = ` ${days} days ago`
+						const rewatched = item.rewatch ? "rewatched" : "watched"
+						let timeAgoStr = ""
+						if (item.watchedOn != null) {
+							const days = daysSinceWatched(item.watchedOn)
+							if (days <= 0) {
+								timeAgoStr = " today"
+							} else if (days === 1) {
+								timeAgoStr = " yesterday"
+							} else {
+								timeAgoStr = ` ${days} days ago`
+							}
 						}
+						const desc = `[${item.creator}](${letterboxdUrl(user)}) ${rewatched}${timeAgoStr}.`
+
+						let review =
+							item.type == ItemType.Review
+								? `\n\n> ${item.review.replace(/\n/gm, "\n\n").replace(/\n/gm, "\n> ")}`
+								: ""
+
+						if (review.length >= 4096 - desc.length) {
+							const more = ` [...more](${item.link})`
+							review = review.slice(0, 4092 - desc.length - more.length) + more
+						}
+
+						if (item.containsSpoilers) {
+							review = `||${review}||`
+						}
+
+						let embed = new MessageEmbed()
+							.setTitle(`${item.filmTitle} (${item.filmYear}) ${item.starRating}`)
+							.setURL(item.link)
+							.setThumbnail(item.posterImageUrl)
+							.setDescription(desc + review)
+							.setColor(item.rewatch ? "#00E054" : "#FF7E02")
+
+						await channel?.send({
+							embeds: [embed],
+						})
+
+						await prisma.user.update({
+							where: { id: user.id },
+							data: { updatedAt: new Date() },
+						})
+					} catch (e) {
+						Sentry.withScope((scope) => {
+							scope.setTag("guildId", guild.id)
+							scope.setContext("user", { id: user.id, username: user.username })
+							scope.setContext("item", { link: item.link, guid: item.guid })
+							Sentry.captureException(e)
+						})
+						console.error(`Failed to post item for ${user.username}:`, e)
+						continue
 					}
-					const desc = `[${item.creator}](${letterboxdUrl(user)}) ${rewatched}${timeAgoStr}.`
-
-					let review =
-						item.type == ItemType.Review
-							? `\n\n> ${item.review.replace(/\n/gm, "\n\n").replace(/\n/gm, "\n> ")}`
-							: ""
-
-					if (review.length >= 4096 - desc.length) {
-						const more = ` [...more](${item.link})`
-						review = review.slice(0, 4092 - desc.length - more.length) + more
-					}
-
-					if (item.containsSpoilers) {
-						review = `||${review}||`
-					}
-
-					let embed = new MessageEmbed()
-						.setTitle(`${item.filmTitle} (${item.filmYear}) ${item.starRating}`)
-						.setURL(item.link)
-						.setThumbnail(item.posterImageUrl)
-						.setDescription(desc + review)
-						.setColor(item.rewatch ? "#00E054" : "#FF7E02")
-
-					await channel?.send({
-						embeds: [embed],
-					})
-
-					await prisma.user.update({
-						where: { id: user.id },
-						data: { updatedAt: new Date() },
-					})
 				}
 			}
 		}

@@ -1,5 +1,6 @@
 import { REST } from "@discordjs/rest"
 import { Routes } from "discord-api-types/v9"
+import * as Sentry from "@sentry/node"
 import { Commands } from "src/commands/command"
 import "dotenv/config"
 
@@ -25,6 +26,10 @@ export async function DeployCommands(guildId: string): Promise<void> {
 		})
 		// console.log(resp)
 	} catch (error) {
+		Sentry.withScope((scope) => {
+			scope.setTag("guildId", guildId)
+			Sentry.captureException(error)
+		})
 		console.error(error)
 	}
 }

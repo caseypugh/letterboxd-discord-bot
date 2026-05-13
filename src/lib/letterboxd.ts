@@ -30,8 +30,7 @@ export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 		if (e instanceof Error && e.message === "Status code 404") {
 			throw new LetterboxdUserNotFoundError(user.username)
 		}
-		console.error(e)
-		return feed
+		throw e
 	}
 	return feed.filter((item) => item.pubDate.getTime() >= (user.lastCheckedAt?.getTime() || 99999999999999))
 }
