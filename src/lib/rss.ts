@@ -25,10 +25,12 @@ export interface RSSItem {
 export function parseItem(item: any): RSSItem {
     // Build fresh — the parser's raw item carries large fields (CDATA `content`,
     // `description`, ...) that mutating-and-returning kept alive per RSSItem.
-    const title = item.title as string
+    const title = typeof item.title === "string" ? item.title : ""
+    const guid = typeof item.guid === "string" ? item.guid : ""
+    const content = typeof item.content === "string" ? item.content : ""
     const starMatch = title.match(/(★|½)+/)
-    const typeMatch = (item.guid as string).match(/letterboxd-([a-z]+)/)
-    const posterImageMatch = (item.content as string).match(/src="(.+?)"/)
+    const typeMatch = guid.match(/letterboxd-([a-z]+)/)
+    const posterImageMatch = content.match(/src="(.+?)"/)
 
     const out = {
         starRating: starMatch ? starMatch[0] : "",
