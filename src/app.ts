@@ -1,6 +1,6 @@
 import "./instrument"
 import * as Sentry from "@sentry/node"
-import { Client, Permissions, InviteScope } from "discord.js"
+import { Client, Options, Permissions, InviteScope } from "discord.js"
 import interactionCreate from "./listeners/interactionCreate"
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds"
@@ -22,6 +22,12 @@ console.log(
 
 const client = new Client({
 	intents: ["GUILDS"],
+	// channel.send() results pile up in MessageManager forever; we never read
+	// them back, so cap to 0 to bound heap.
+	makeCache: Options.cacheWithLimits({
+		...Options.defaultMakeCacheSettings,
+		MessageManager: 0,
+	}),
 })
 
 client.on("ready", async () => {

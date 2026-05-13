@@ -23,34 +23,32 @@ export interface RSSItem {
 }
 
 export function parseItem(item: any): RSSItem {
-    let _item: RSSItem = item
-
-    const typeMatch = (item.guid as string).match(/letterboxd-([a-z]+)/)
-    if (typeMatch) {
-        _item.type = typeMatch[1] as ItemType
-    }
-
+    // Build fresh — the parser's raw item carries large fields (CDATA `content`,
+    // `description`, ...) that mutating-and-returning kept alive per RSSItem.
     const title = item.title as string
-    let match = title.match(/(★|½)+/)
-    _item.starRating = match ? match[0] : ""
-
-    _item.rating = parseFloat(item.memberRating)
-    _item.pubDate = new Date(Date.parse(item.pubDate))
-    _item.rewatch = item.rewatch == 'Yes'
-    if (item.watchedDate) {
-        _item.watchedOn = new Date(Date.parse(item.watchedDate))
-    }
-
+    const starMatch = title.match(/(★|½)+/)
+    const typeMatch = (item.guid as string).match(/letterboxd-([a-z]+)/)
     const posterImageMatch = (item.content as string).match(/src="(.+?)"/)
-    if (posterImageMatch) {
-        _item.posterImageUrl = posterImageMatch[1]
+
+    const out = {
+        starRating: starMatch ? starMatch[0] : "",
+        rewatch: item.rewatch == 'Yes',
+        rating: parseFloat(item.memberRating),
+        link: item.link,
+        pubDate: new Date(Date.parse(item.pubDate)),
+        watchedOn: item.watchedDate ? new Date(Date.parse(item.watchedDate)) : null,
+        creator: item.creator,
+        guid: item.guid,
+        posterImageUrl: posterImageMatch ? posterImageMatch[1] : "",
+        filmTitle: item.filmTitle,
+        filmYear: item.filmYear,
+        review: item.contentSnippet,
+        containsSpoilers: /spoiler/.test(title),
+    } as RSSItem
+
+    if (typeMatch) {
+        out.type = typeMatch[1] as ItemType
     }
 
-    const spoilerMatch = title.match(/spoiler/)
-    if (spoilerMatch) {
-        _item.containsSpoilers = true
-    }
-
-    _item.review = item.contentSnippet
-    return _item
+    return out
 }
