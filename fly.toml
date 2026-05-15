@@ -9,6 +9,12 @@
 app = 'letterboxd-discord-bot'
 primary_region = 'ord'
 
+# Bucket "today"/"yesterday" in the audience's wall-clock TZ, not UTC.
+# Letterboxd's watchedDate is a tz-less YYYY-MM-DD; comparing against now in
+# the bot's local TZ keeps the relative-day string aligned for that audience.
+[env]
+TZ = 'America/Los_Angeles'
+
 [build]
 
 [[vm]]

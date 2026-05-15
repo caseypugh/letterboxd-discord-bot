@@ -11,13 +11,16 @@ import {
 	letterboxdUrl,
 } from "./lib/letterboxd"
 
-// watchedOn from Letterboxd is a calendar date with no time/timezone; compare
-// in whole UTC days so the displayed string doesn't drift with server time.
+// watchedOn from Letterboxd is "YYYY-MM-DD" with no TZ — parseItem turned it into
+// UTC midnight, but the field is really a calendar date in the watcher's local TZ.
+// Bucket it in the process's local TZ so deployers can set TZ to their audience's
+// zone (see fly.toml). UTC components on watchedOn recover the original YMD;
+// local components on "now" pick the bot's wall-clock day.
 function daysSinceWatched(watchedOn: Date): number {
 	const now = new Date()
-	const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-	const watchedUtc = Date.UTC(watchedOn.getUTCFullYear(), watchedOn.getUTCMonth(), watchedOn.getUTCDate())
-	return Math.floor((todayUtc - watchedUtc) / 86400000)
+	const todayLocal = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+	const watchedLocal = Date.UTC(watchedOn.getUTCFullYear(), watchedOn.getUTCMonth(), watchedOn.getUTCDate())
+	return Math.floor((todayLocal - watchedLocal) / 86400000)
 }
 
 // Resolve a channel we can actually post to. Try the admin-configured channel
