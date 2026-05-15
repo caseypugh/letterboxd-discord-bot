@@ -1,27 +1,14 @@
-import { Client, Guild, MessageEmbed, TextChannel } from "discord.js"
+import { Client, Guild, TextChannel } from "discord.js"
 import delay from "promise-delay-ts"
 import * as Sentry from "@sentry/node"
-import { ItemType } from "./lib/rss"
 import prisma from "./lib/prisma"
 import { Users } from "./models/user"
 import {
 	getLatestDiaryEntries,
 	LetterboxdTransientError,
 	LetterboxdUserNotFoundError,
-	letterboxdUrl,
 } from "./lib/letterboxd"
-
-// watchedOn from Letterboxd is "YYYY-MM-DD" with no TZ — parseItem turned it into
-// UTC midnight, but the field is really a calendar date in the watcher's local TZ.
-// Bucket it in the process's local TZ so deployers can set TZ to their audience's
-// zone (see fly.toml). UTC components on watchedOn recover the original YMD;
-// local components on "now" pick the bot's wall-clock day.
-function daysSinceWatched(watchedOn: Date): number {
-	const now = new Date()
-	const todayLocal = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
-	const watchedLocal = Date.UTC(watchedOn.getUTCFullYear(), watchedOn.getUTCMonth(), watchedOn.getUTCDate())
-	return Math.floor((todayLocal - watchedLocal) / 86400000)
-}
+import { buildDiaryEmbed } from "./lib/embed"
 
 // Resolve a channel we can actually post to. Try the admin-configured channel
 // first; on perm failure or missing channel, fall back to systemChannel so a
@@ -130,43 +117,8 @@ export const CheckFeeds = async (client: Client) => {
 					try {
 						console.log(`=> ${item.creator} watched ${item.filmTitle} ${item.link}`)
 
-						const rewatched = item.rewatch ? "rewatched" : "watched"
-						let timeAgoStr = ""
-						if (item.watchedOn != null) {
-							const days = daysSinceWatched(item.watchedOn)
-							if (days <= 0) {
-								timeAgoStr = " today"
-							} else if (days === 1) {
-								timeAgoStr = " yesterday"
-							} else {
-								timeAgoStr = ` ${days} days ago`
-							}
-						}
-						const desc = `[${item.creator}](${letterboxdUrl(user)}) ${rewatched}${timeAgoStr}.`
-
-						let review =
-							item.type == ItemType.Review
-								? `\n\n> ${item.review.replace(/\n/gm, "\n\n").replace(/\n/gm, "\n> ")}`
-								: ""
-
-						if (review.length >= 4096 - desc.length) {
-							const more = ` [...more](${item.link})`
-							review = review.slice(0, 4092 - desc.length - more.length) + more
-						}
-
-						if (item.containsSpoilers) {
-							review = `||${review}||`
-						}
-
-						let embed = new MessageEmbed()
-							.setTitle(`${item.filmTitle} (${item.filmYear}) ${item.starRating}`)
-							.setURL(item.link)
-							.setThumbnail(item.posterImageUrl)
-							.setDescription(desc + review)
-							.setColor(item.rewatch ? "#00E054" : "#FF7E02")
-
 						await channel?.send({
-							embeds: [embed],
+							embeds: [buildDiaryEmbed(item, user)],
 						})
 
 						await prisma.user.update({

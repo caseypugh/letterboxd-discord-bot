@@ -4,6 +4,7 @@ import { Client, Options, Permissions, InviteScope } from "discord.js"
 import interactionCreate from "./listeners/interactionCreate"
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds"
+import { resolveEmojis } from "./lib/embed"
 import guildCreate from "./listeners/guildCreate"
 import guildDelete from "./listeners/guildDelete"
 import error from "./listeners/error"
@@ -36,6 +37,8 @@ client.on("ready", async () => {
 	if (!client.user || !client.application) {
 		return
 	}
+
+	await resolveEmojis(client)
 
 	// Run the feed check every minute
 	const job = CronJob.from({

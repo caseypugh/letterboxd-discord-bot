@@ -21,6 +21,7 @@ export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 				["letterboxd:filmTitle", "filmTitle"],
 				["letterboxd:filmYear", "filmYear"],
 				["letterboxd:memberRating", "memberRating"],
+				["letterboxd:memberLike", "memberLike"],
 				["dc:creator", "creator"],
 			],
 		},
