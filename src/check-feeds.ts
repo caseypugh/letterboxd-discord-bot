@@ -4,7 +4,12 @@ import * as Sentry from "@sentry/node"
 import { ItemType } from "./lib/rss"
 import prisma from "./lib/prisma"
 import { Users } from "./models/user"
-import { getLatestDiaryEntries, LetterboxdUserNotFoundError, letterboxdUrl } from "./lib/letterboxd"
+import {
+	getLatestDiaryEntries,
+	LetterboxdTransientError,
+	LetterboxdUserNotFoundError,
+	letterboxdUrl,
+} from "./lib/letterboxd"
 
 // watchedOn from Letterboxd is a calendar date with no time/timezone; compare
 // in whole UTC days so the displayed string doesn't drift with server time.
@@ -49,7 +54,7 @@ export const CheckFeeds = async (client: Client) => {
 
 	try {
 		const guilds = client.guilds.cache
-		for (const [key, guild] of guilds) {
+		guildLoop: for (const [key, guild] of guilds) {
 			console.log("Checking guild", guild.name, "....")
 
 			let guildConfig = await prisma.guildConfig.findFirst({
@@ -97,6 +102,10 @@ export const CheckFeeds = async (client: Client) => {
 						console.warn(`Letterboxd user ${user.username} returned 404, deleting`)
 						await prisma.user.delete({ where: { id: user.id } })
 						continue
+					}
+					if (e instanceof LetterboxdTransientError) {
+						console.warn(`Letterboxd returned ${e.statusCode}, bailing tick — retry in 60s`)
+						break guildLoop
 					}
 					Sentry.withScope((scope) => {
 						scope.setTag("guildId", guild.id)

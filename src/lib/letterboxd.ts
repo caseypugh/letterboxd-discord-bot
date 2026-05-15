@@ -4,6 +4,11 @@ import { ItemType, parseItem, RSSItem } from "src/lib/rss"
 import fetch from "node-fetch"
 
 export class LetterboxdUserNotFoundError extends Error {}
+export class LetterboxdTransientError extends Error {
+	constructor(public statusCode: number, username: string) {
+		super(`Letterboxd returned ${statusCode} for ${username}`)
+	}
+}
 
 export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 	console.log(`Fetching RSS feed for ${user.username} - ${letterboxdRssUrl(user)}`)
@@ -27,8 +32,13 @@ export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 			.map((i) => parseItem(i))
 			.filter((i) => i.type == ItemType.Review || i.type == ItemType.Watch)
 	} catch (e) {
-		if (e instanceof Error && e.message === "Status code 404") {
-			throw new LetterboxdUserNotFoundError(user.username)
+		if (e instanceof Error) {
+			const match = e.message.match(/^Status code (\d+)$/)
+			if (match) {
+				const status = parseInt(match[1], 10)
+				if (status === 404) throw new LetterboxdUserNotFoundError(user.username)
+				if (status === 429 || status >= 500) throw new LetterboxdTransientError(status, user.username)
+			}
 		}
 		throw e
 	}
