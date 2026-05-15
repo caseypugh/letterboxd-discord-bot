@@ -15,6 +15,7 @@
 		"down": "docker compose down",
 		"dev": "NODE_PATH=./ nodemon --watch \"src/**/*\" --ext ts --exec \"ts-node src/app.ts\"",
 		"deploy-commands": "NODE_PATH=./ ts-node src/tools/deploy-commands.ts",
+		"test-feed": "NODE_PATH=./ ts-node src/tools/test-feed.ts",
 		"test": "ts-node test.ts",
 		"db:migrate": "prisma migrate dev",
 		"db:generate": "prisma generate"
