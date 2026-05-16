@@ -22,18 +22,3 @@ export async function DeployCommandsGlobal(): Promise<void> {
 	}
 }
 
-// Clears any per-guild command registrations left over from the old per-guild
-// deploy strategy. Without this, users see each command twice until Discord
-// expires the guild copy.
-export async function WipeGuildCommands(guildId: string): Promise<void> {
-	try {
-		console.log(`Wiping guild command registrations from ${guildId} ...`)
-		await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] })
-	} catch (error) {
-		Sentry.withScope((scope) => {
-			scope.setTag("guildId", guildId)
-			Sentry.captureException(error)
-		})
-		console.error(error)
-	}
-}
