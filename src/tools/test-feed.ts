@@ -79,7 +79,9 @@ async function main() {
 	// Fake a User shape so getLatestDiaryEntries' lastCheckedAt filter passes.
 	// Use a year ago — epoch 0 trips a `0 || 99999...` falsy fallback in the filter.
 	const fakeUser = { username, lastCheckedAt: new Date(Date.now() - 365 * 86400000) } as User
-	const items = (await getLatestDiaryEntries(fakeUser)).slice(0, count)
+	// getLatestDiaryEntries returns oldest-first; take the tail so `count` means
+	// "most recent N", then post in chronological order (matches production).
+	const items = (await getLatestDiaryEntries(fakeUser)).slice(-count)
 	console.log(`fetched ${items.length} item(s) for ${username}`)
 
 	for (const item of items) {
