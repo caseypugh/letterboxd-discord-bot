@@ -67,6 +67,7 @@ function ratingEmoji(rating: number): string {
 	const half = rating - full >= 0.5
 	const parts = Array(full).fill(emojis.star)
 	if (half) parts.push(emojis.half)
+	// Joined with U+2060 WORD JOINER (invisible) so Discord won't wrap the rating mid-emoji.
 	return parts.join("⁠")
 }
 
