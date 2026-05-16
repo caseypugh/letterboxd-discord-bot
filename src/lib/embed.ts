@@ -58,7 +58,7 @@ function whenText(item: RSSItem): string {
 	if (pubYMD === watchedYMD) return `<t:${pubTs}:R>`
 
 	const showYear = item.watchedOn.getUTCFullYear() !== new Date().getUTCFullYear()
-	const opts: Intl.DateTimeFormatOptions = { month: "long", day: "numeric", timeZone: "UTC" }
+	const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", timeZone: "UTC" }
 	if (showYear) opts.year = "numeric"
 	return `on ${item.watchedOn.toLocaleString("en-US", opts)}`
 }
