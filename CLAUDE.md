@@ -8,7 +8,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm start` — production entry; runs `prisma migrate deploy`, `prisma generate`, then `ts-node src/app.ts`. Used as the container `CMD` in the included `Dockerfile`.
 - `pnpm db:migrate` — `prisma migrate dev` against `DATABASE_URL`.
 - `pnpm db:generate` — regenerate the Prisma client (run after editing `prisma/schema.prisma`).
-- `pnpm deploy-commands` — script entry to push slash command definitions; note that in normal operation `app.ts` already deploys commands to every guild on `ready` and on `guildCreate`, so manual invocation is rarely needed.
 - `pnpm test` — runs `ts-node test.ts`. The file does not exist in the repo; there is no real test suite.
 
 Required env vars (`.env`, see `.env.sample`): `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, `DATABASE_URL` (Postgres). `ENV=dev` is read in `lib/deploy-commands.ts` but currently no-op.
@@ -23,7 +22,7 @@ Single-process Discord bot. There is no HTTP server; the bot is a long-running w
 
 **Entry point — `src/app.ts`:**
 1. Creates a `discord.js` v13 `Client` with only the `GUILDS` intent (no message content / member intents).
-2. On `ready`, fetches all guilds and calls `DeployCommands(guildId)` for each — slash commands are registered per-guild, not globally.
+2. On `ready`, calls `DeployCommandsGlobal()` once — slash commands are registered globally, so the bot's profile shows them as Commands chips and `</command:id>` mentions resolve anywhere. First publish can take up to ~1hr to propagate; updates are usually fast.
 3. Starts a `cron` job `0 */1 * * * *` (every minute, plus `runOnInit: true`) that calls `CheckFeeds(client)`.
 4. Wires listeners: `interactionCreate`, `guildCreate`, `guildDelete`, `error`.
 

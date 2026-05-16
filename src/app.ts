@@ -4,6 +4,7 @@ import { Client, Options, Permissions, InviteScope } from "discord.js"
 import interactionCreate from "./listeners/interactionCreate"
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds"
+import { DeployCommandsGlobal, WipeGuildCommands } from "./lib/deploy-commands"
 import { resolveEmojis } from "./lib/embed"
 import guildCreate from "./listeners/guildCreate"
 import guildDelete from "./listeners/guildDelete"
@@ -39,6 +40,14 @@ client.on("ready", async () => {
 	}
 
 	await resolveEmojis(client)
+	await DeployCommandsGlobal()
+
+	// Clear leftover per-guild registrations from the old per-guild deploy
+	// strategy. PUT with empty body is idempotent, so steady-state startups are
+	// no-ops after every guild has been cleaned up once.
+	for (const [, guild] of client.guilds.cache) {
+		await WipeGuildCommands(guild.id)
+	}
 
 	// Run the feed check every minute
 	const job = CronJob.from({
