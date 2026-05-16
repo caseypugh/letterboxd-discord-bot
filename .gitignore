@@ -1,6 +1,6 @@
 .env
 node_modules/
 config.json
-yarn-error.log
+pnpm-debug.log*
 data/*
 .DS_Store

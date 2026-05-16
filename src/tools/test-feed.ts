@@ -7,10 +7,10 @@ import "dotenv/config"
 // End-to-end test: fetch a real Letterboxd RSS feed and post the most recent
 // entries to a Discord channel using the same embed format as check-feeds.ts.
 // Usage:
-//   yarn test-feed <channelId>            # cpu, 3 entries
-//   yarn test-feed <channelId> 10         # cpu, 10 entries
-//   yarn test-feed <channelId> bdougherty # bdougherty, 3 entries
-//   yarn test-feed <channelId> bdougherty 10
+//   pnpm test-feed <channelId>            # cpu, 3 entries
+//   pnpm test-feed <channelId> 10         # cpu, 10 entries
+//   pnpm test-feed <channelId> bdougherty # bdougherty, 3 entries
+//   pnpm test-feed <channelId> bdougherty 10
 // Run with no args to list channels the bot can post to.
 
 async function main() {
@@ -24,7 +24,7 @@ async function main() {
 	const listOnly = !channelId || channelId === "--list"
 
 	// Args 3 and 4 are either [username, count] or [count] alone — a bare
-	// numeric in position 3 means count, so `yarn test-feed <id> 10` works.
+	// numeric in position 3 means count, so `pnpm test-feed <id> 10` works.
 	const rest = process.argv.slice(3)
 	const numericIdx = rest.findIndex((a) => /^\d+$/.test(a))
 	const count = numericIdx >= 0 ? parseInt(rest[numericIdx], 10) : 3

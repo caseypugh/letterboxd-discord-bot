@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- `yarn dev` — run the bot locally with hot reload (nodemon + ts-node, watches `src/**/*.ts`).
-- `yarn start` — production entry; runs `prisma migrate deploy`, `prisma generate`, then `ts-node src/app.ts`. Used as the container `CMD` in the included `Dockerfile`.
-- `yarn db:migrate` — `prisma migrate dev` against `DATABASE_URL`.
-- `yarn db:generate` — regenerate the Prisma client (run after editing `prisma/schema.prisma`).
-- `yarn deploy-commands` — script entry to push slash command definitions; note that in normal operation `app.ts` already deploys commands to every guild on `ready` and on `guildCreate`, so manual invocation is rarely needed.
-- `yarn test` — runs `ts-node test.ts`. The file does not exist in the repo; there is no real test suite.
+- `pnpm dev` — run the bot locally with hot reload (nodemon + ts-node, watches `src/**/*.ts`).
+- `pnpm start` — production entry; runs `prisma migrate deploy`, `prisma generate`, then `ts-node src/app.ts`. Used as the container `CMD` in the included `Dockerfile`.
+- `pnpm db:migrate` — `prisma migrate dev` against `DATABASE_URL`.
+- `pnpm db:generate` — regenerate the Prisma client (run after editing `prisma/schema.prisma`).
+- `pnpm deploy-commands` — script entry to push slash command definitions; note that in normal operation `app.ts` already deploys commands to every guild on `ready` and on `guildCreate`, so manual invocation is rarely needed.
+- `pnpm test` — runs `ts-node test.ts`. The file does not exist in the repo; there is no real test suite.
 
 Required env vars (`.env`, see `.env.sample`): `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, `DATABASE_URL` (Postgres). `ENV=dev` is read in `lib/deploy-commands.ts` but currently no-op.
 

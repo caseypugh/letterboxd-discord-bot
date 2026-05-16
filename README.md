@@ -58,12 +58,12 @@ If you'd rather use a Postgres install of your own, just update `DATABASE_URL` i
 
 Install dependencies once:
 ```
-yarn install
+pnpm install
 ```
 
 Then bring up the whole dev environment with one command:
 ```sh
-yarn up
+pnpm up
 ```
 
 This starts the local Postgres container (waits for it to be healthy), applies any pending migrations, and runs the bot with hot reload.
@@ -71,8 +71,8 @@ This starts the local Postgres container (waits for it to be healthy), applies a
 If you'd rather run the pieces separately:
 ```sh
 docker compose up -d   # start Postgres
-yarn db:migrate        # apply migrations
-yarn dev               # run the bot
+pnpm db:migrate        # apply migrations
+pnpm dev               # run the bot
 ```
 
 ## Deployment
