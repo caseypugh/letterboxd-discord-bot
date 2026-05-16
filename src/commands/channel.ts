@@ -43,7 +43,7 @@ export const ChannelCommand: Command = {
 			return
 		}
 
-		if (!interaction.guild?.me?.permissionsIn(channel).has(["SEND_MESSAGES", "VIEW_CHANNEL"])) {
+		if (!interaction.guild?.members.me?.permissionsIn(channel).has(["SEND_MESSAGES", "VIEW_CHANNEL"])) {
 			await interaction.followUp({
 				embeds: [errorMessageEmbed(`Letterboxd doesnt have permission to post to this channel.`)],
 			})

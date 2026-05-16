@@ -14,7 +14,7 @@ import { buildDiaryEmbed } from "./lib/embed"
 // first; on perm failure or missing channel, fall back to systemChannel so a
 // broken `/channel` config can't silently disable the guild.
 function pickChannel(guild: Guild, configuredId: string | null): TextChannel | null {
-	const me = guild.me ?? guild.client.user!.id
+	const me = guild.members.me ?? guild.client.user!.id
 	const usable = (id: string): TextChannel | null => {
 		const ch = guild.channels.cache.get(id)
 		if (!ch || !ch.isText()) return null
