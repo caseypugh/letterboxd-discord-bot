@@ -65,7 +65,9 @@ function ratingEmoji(rating: number): string {
 	if (!rating || isNaN(rating)) return ""
 	const full = Math.floor(rating)
 	const half = rating - full >= 0.5
-	return emojis.star.repeat(full) + (half ? emojis.half : "")
+	const parts = Array(full).fill(emojis.star)
+	if (half) parts.push(emojis.half)
+	return parts.join("⁠")
 }
 
 export function buildDiaryEmbed(item: RSSItem, user: User): MessageEmbed {
