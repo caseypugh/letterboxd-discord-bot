@@ -43,7 +43,9 @@ export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 		}
 		throw e
 	}
-	return feed.filter((item) => item.pubDate.getTime() >= (user.lastCheckedAt?.getTime() || 99999999999999))
+	return feed
+		.filter((item) => item.pubDate.getTime() >= (user.lastCheckedAt?.getTime() || 99999999999999))
+		.sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime())
 }
 
 export function letterboxdRssUrl(user: User): string {
