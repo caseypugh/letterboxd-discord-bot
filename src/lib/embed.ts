@@ -8,11 +8,13 @@ import { letterboxdUrl } from "./letterboxd"
 // We resolve IDs from the bot's *application* emojis (uploaded under the bot
 // in the Developer Portal) — these are scoped to the application, usable in
 // every guild it's in, and separate from per-guild emojis. Convention: names
-// "star" / "half" / "heart". Falls back to Unicode if any are missing.
+// "star" / "half" / "heart" / "rewatch". Falls back to Unicode if any are
+// missing; rewatch has no good Unicode equivalent, so it falls back to empty.
 const emojis = {
 	star: "★",
 	half: "½",
 	heart: "❤️",
+	rewatch: "",
 }
 
 type AppEmoji = { id: string; name: string }
@@ -30,7 +32,7 @@ export async function resolveEmojis(client: Client): Promise<void> {
 		console.log(`resolveEmojis: ${result.items.length} application emoji(s)`)
 		for (const emoji of result.items) {
 			const name = emoji.name?.toLowerCase()
-			if (name === "star" || name === "half" || name === "heart") {
+			if (name === "star" || name === "half" || name === "heart" || name === "rewatch") {
 				emojis[name] = `<:${emoji.name}:${emoji.id}>`
 			}
 		}
@@ -73,7 +75,8 @@ function ratingEmoji(rating: number): string {
 
 export function buildDiaryEmbed(item: RSSItem, user: User): MessageEmbed {
 	const rewatched = item.rewatch ? "rewatched" : "watched"
-	const desc = `[${item.creator}](${letterboxdUrl(user)}) ${rewatched} ${whenText(item)}.`
+	const prefix = item.rewatch && emojis.rewatch ? `${emojis.rewatch} ` : ""
+	const desc = `${prefix}[${item.creator}](${letterboxdUrl(user)}) ${rewatched} ${whenText(item)}.`
 
 	let review =
 		item.type == ItemType.Review
