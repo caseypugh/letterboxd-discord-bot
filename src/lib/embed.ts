@@ -91,8 +91,10 @@ export function buildDiaryEmbed(item: RSSItem, user: User): MessageEmbed {
 
 	const titleParts = [`${item.filmTitle} (${item.filmYear})`]
 	const stars = ratingEmoji(item.rating)
-	if (stars) titleParts.push(stars)
-	if (item.liked) titleParts.push(emojis.heart)
+	// U+2060 word joiner (invisible) between stars and heart so they don't wrap apart.
+	if (stars && item.liked) titleParts.push(`${stars}⁠${emojis.heart}`)
+	else if (stars) titleParts.push(stars)
+	else if (item.liked) titleParts.push(emojis.heart)
 
 	return new MessageEmbed()
 		.setTitle(titleParts.join(" "))
