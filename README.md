@@ -16,6 +16,7 @@ Or follow the instructions below on how to host the bot yourself.
 - `/remove` - Unsubscribe a Letterboxd user
 - `/list` - See a list of all the current users
 - `/channel` - Update which channel to post to. (Defaults to the system channel)
+- `/snooze` - Mute a user's posts for N hours (max 720); pass `0` to unsnooze
 
 
 ### How it works
