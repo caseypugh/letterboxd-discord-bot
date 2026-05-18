@@ -12,6 +12,10 @@ import error from "./listeners/error"
 import "dotenv/config"
 
 console.log("Letterboxd is starting...")
+const tok = process.env.DISCORD_TOKEN ?? ""
+console.log(
+	`Loaded DISCORD_CLIENT_ID=${process.env.DISCORD_CLIENT_ID} DISCORD_TOKEN=${tok.slice(0, 8)}…${tok.slice(-4)} (len ${tok.length})`,
+)
 const permissions =	Permissions.FLAGS.SEND_MESSAGES 
 
 const scopes: InviteScope[] = ["bot", "applications.commands"]
@@ -33,7 +37,7 @@ const client = new Client({
 })
 
 client.on("ready", async () => {
-	console.log(`\n----------- ${client.user?.username} is online -----------`)
+	console.log(`\n----------- ${client.user?.tag} (${client.user?.id}) is online -----------`)
 
 	if (!client.user || !client.application) {
 		return
@@ -65,4 +69,7 @@ guildCreate(client)
 guildDelete(client)
 error(client)
 
-client.login(process.env.DISCORD_TOKEN)
+client.login(process.env.DISCORD_TOKEN).catch((err) => {
+	console.error("Discord login failed — check DISCORD_TOKEN:", err.message || err)
+	process.exit(1)
+})
