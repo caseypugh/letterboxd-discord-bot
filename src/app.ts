@@ -12,10 +12,6 @@ import error from "./listeners/error"
 import "dotenv/config"
 
 console.log("Letterboxd is starting...")
-const tok = process.env.DISCORD_TOKEN ?? ""
-console.log(
-	`Loaded DISCORD_CLIENT_ID=${process.env.DISCORD_CLIENT_ID} DISCORD_TOKEN=${tok.slice(0, 8)}…${tok.slice(-4)} (len ${tok.length})`,
-)
 const permissions =	Permissions.FLAGS.SEND_MESSAGES 
 
 const scopes: InviteScope[] = ["bot", "applications.commands"]
