@@ -17,6 +17,7 @@ model User {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   lastCheckedAt DateTime?
+  snoozedUntil  DateTime?
   guild         GuildConfig @relation(fields: [guildId], references: [guildId])
 
   @@unique([username, guildId], name: "userIdentifier")

@@ -15,12 +15,12 @@ export function Users(prisma: PrismaClient) {
 			}
 
 			const delayBeforeCheck = 60 * 10 * 1000 // 10 minutes
+			const now = new Date().getTime()
 			const users = await this.all(guildId)
 
 			return users.filter((user) => {
-				const elapsed = new Date().getTime() - (user.lastCheckedAt?.getTime() || 0)
-				// if (elapsed <= delayBeforeCheck)
-				//     console.log(`=> Skipping ${user.username} - last updated`, elapsed / 1000, 'seconds ago', user.lastCheckedAt)
+				if (user.snoozedUntil && user.snoozedUntil.getTime() > now) return false
+				const elapsed = now - (user.lastCheckedAt?.getTime() || 0)
 				return elapsed > delayBeforeCheck
 			})
 		},

@@ -29,8 +29,14 @@ export const ListUsersCommand: Command = {
 
 		let content = users.length === 0 ? "No users added yet. Use `/add` to add one." : ""
 
+		const now = Date.now()
 		for await (let user of users) {
-			content += `- [${user.username}](${letterboxdUrl(user)})\n`
+			let line = `- [${user.username}](${letterboxdUrl(user)})`
+			if (user.snoozedUntil && user.snoozedUntil.getTime() > now) {
+				const unix = Math.floor(user.snoozedUntil.getTime() / 1000)
+				line += ` — 💤 snoozed (ends <t:${unix}:R>)`
+			}
+			content += `${line}\n`
 		}
 
 		const embed = new MessageEmbed().setTitle("Letterboxd Users").setDescription(content).setColor("#FF7E02")

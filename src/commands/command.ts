@@ -4,6 +4,7 @@ import { AddUserCommand } from "src/commands/add";
 import { ChannelCommand } from "src/commands/channel";
 import { ListUsersCommand } from "src/commands/list";
 import { RemoveUserCommand } from "src/commands/remove";
+import { SnoozeUserCommand } from "src/commands/snooze";
 
 export interface Command {
     command: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
@@ -15,4 +16,5 @@ export const Commands: Command[] = [
     ListUsersCommand,
     AddUserCommand,
     RemoveUserCommand,
+    SnoozeUserCommand,
 ]
