@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
 import { BaseCommandInteraction, Client, TextChannel } from "discord.js"
+import * as Sentry from "@sentry/node"
 import delay from "promise-delay-ts"
 import { isValidUser, letterboxdUrl, parseUsername } from "src/lib/letterboxd"
 import { errorMessageEmbed } from "src/lib/error"
@@ -83,9 +84,21 @@ export const AddUserCommand: Command = {
 				channel = (await interaction.guild?.channels.fetch(config.channelId)) as TextChannel
 			}
 
-			channel?.send({
-				content: `Subscribed to new diary entries from ${letterboxdUrl(user)}`,
-			})
+			try {
+				await channel?.send({
+					content: `Subscribed to new diary entries from ${letterboxdUrl(user)}`,
+				})
+			} catch (e) {
+				Sentry.withScope((scope) => {
+					scope.setTag("command", "add")
+					scope.setContext("interaction", {
+						guildId,
+						channelId: channel?.id,
+					})
+					Sentry.captureException(e)
+				})
+				console.error(`Failed to post public confirmation for ${user.username}:`, e)
+			}
 		} else {
 			await interaction.followUp({
 				ephemeral: true,
