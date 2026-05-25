@@ -5,14 +5,20 @@ import fetch from "node-fetch"
 
 export class LetterboxdUserNotFoundError extends Error {}
 export class LetterboxdTransientError extends Error {
-	constructor(public statusCode: number, username: string) {
-		super(`Letterboxd returned ${statusCode} for ${username}`)
+	constructor(public reason: string, username: string) {
+		super(`Letterboxd transient error for ${username}: ${reason}`)
 	}
 }
+
+// Default rss-parser timeout is 60s — same length as our cron interval, so one
+// hung Letterboxd request stalls the entire tick. Cap it well below so we can
+// bail and let the next tick decide what to do.
+const RSS_TIMEOUT_MS = 15000
 
 export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 	console.log(`Fetching RSS feed for ${user.username} - ${letterboxdRssUrl(user)}`)
 	const parser = new Parser({
+		timeout: RSS_TIMEOUT_MS,
 		headers: { "User-Agent": "letterboxd-discord-bot/1.0" },
 		customFields: {
 			item: [
@@ -38,7 +44,15 @@ export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 			if (match) {
 				const status = parseInt(match[1], 10)
 				if (status === 404) throw new LetterboxdUserNotFoundError(user.username)
-				if (status === 429 || status >= 500) throw new LetterboxdTransientError(status, user.username)
+				if (status === 429 || status >= 500) {
+					throw new LetterboxdTransientError(`status ${status}`, user.username)
+				}
+			}
+			// rss-parser throws this exact shape on its internal timeout; treat
+			// it the same as a 5xx since Letterboxd being unresponsive is the
+			// same symptom as Letterboxd being down.
+			if (/^Request timed out after \d+ms$/.test(e.message)) {
+				throw new LetterboxdTransientError("timeout", user.username)
 			}
 		}
 		throw e

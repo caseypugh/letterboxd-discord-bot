@@ -94,7 +94,7 @@ export const CheckFeeds = async (client: Client) => {
 						continue
 					}
 					if (e instanceof LetterboxdTransientError) {
-						console.warn(`Letterboxd returned ${e.statusCode}, bailing tick — retry in 60s`)
+						console.warn(`Letterboxd transient error (${e.reason}), bailing tick — retry in 60s`)
 						break guildLoop
 					}
 					Sentry.withScope((scope) => {
