@@ -4,3 +4,7 @@ config.json
 pnpm-debug.log*
 data/*
 .DS_Store
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db
+prisma/*.db-*

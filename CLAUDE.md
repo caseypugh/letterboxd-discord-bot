@@ -5,16 +5,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 - `pnpm dev` — run the bot locally with hot reload (nodemon + ts-node, watches `src/**/*.ts`).
-- `pnpm start` — production entry; runs `prisma migrate deploy`, `prisma generate`, then `ts-node src/app.ts`. Used as the container `CMD` in the included `Dockerfile`.
-- `pnpm db:migrate` — `prisma migrate dev` against `DATABASE_URL`.
+- `pnpm start` — production entry; runs `pnpm db:deploy` (custom migration runner), `prisma generate`, then `ts-node src/app.ts`. Used as the container `CMD` in the included `Dockerfile`.
+- `pnpm db:migrate` — `prisma migrate dev` against the local SQLite file in `DATABASE_URL`.
+- `pnpm db:deploy` — `src/tools/migrate.ts`: applies pending `prisma/migrations/*/migration.sql` over libSQL, since `prisma migrate deploy` cannot connect to Turso's `libsql://` protocol. Tracks applied migrations in a `_migrations` table and also honors `_prisma_migrations` entries so a `prisma migrate dev`-managed local DB is never double-migrated.
 - `pnpm db:generate` — regenerate the Prisma client (run after editing `prisma/schema.prisma`).
 - `pnpm test` — runs `ts-node test.ts`. The file does not exist in the repo; there is no real test suite.
 
-Required env vars (`.env`, see `.env.sample`): `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, `DATABASE_URL` (Postgres). `ENV=dev` is read in `lib/deploy-commands.ts` but currently no-op.
+Required env vars (`.env`, see `.env.sample`): `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and either `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` (production, takes precedence) or `DATABASE_URL` as a `file:` SQLite path (local dev, default `file:./dev.db` relative to `prisma/`). `ENV=dev` is read in `lib/deploy-commands.ts` but currently no-op.
 
 Node 24 (see `engines` in `package.json` and `.nvmrc`).
 
-**Deployment:** the repo ships a `Dockerfile` and a `fly.toml` configured as a worker (no HTTP service). `.github/workflows/deploy.yml` deploys to Fly on push to `main` via the `FLY_API_TOKEN` secret. Postgres is expected to be external (Neon recommended); set `DATABASE_URL` via `fly secrets set`.
+**Deployment:** the repo ships a `Dockerfile` and a `fly.toml` configured as a worker (no HTTP service). `.github/workflows/deploy.yml` deploys to Fly on push to `main` via the `FLY_API_TOKEN` secret. The database is SQLite hosted on Turso; set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` via `fly secrets set`. `src/tools/migrate-data.ts` is a one-off Neon→Turso row copier (see README).
 
 ## Architecture
 
@@ -38,6 +39,7 @@ Single-process Discord bot. There is no HTTP server; the bot is a long-running w
 - `remove` / `list` / `channel` — direct Prisma reads/writes against `User` and `GuildConfig`.
 
 **Data — `prisma/schema.prisma`:**
+- Provider is `sqlite`; the client connects through the libSQL driver adapter (`@prisma/adapter-libsql`) built in `src/lib/prisma.ts`. `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN` win over `DATABASE_URL`. Relative `file:` URLs are anchored to the `prisma/` directory there so the CLI and runtime open the same file.
 - `User`: `(username, guildId)` is unique — the same Letterboxd handle can be subscribed in multiple guilds (separate rows). `lastCheckedAt` drives staleness.
 - `GuildConfig`: one per guild. `channelId` is nullable; `null` means fall back to the guild's system channel.
 - `guildDelete` listener hard-deletes both `User` and `GuildConfig` rows for the guild — there is no soft delete or retention.

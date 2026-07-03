@@ -46,15 +46,7 @@ Create an `.env` from the sample file and fill in your Discord credentials.
 cp .env.sample .env
 ```
 
-Data is stored in Postgres via Prisma. The repo includes a `docker-compose.yml` for local development — start it with:
-
-```sh
-docker compose up -d
-```
-
-This runs Postgres 17 on `localhost:5432` with the credentials already wired into `.env.sample`. To stop it: `docker compose down`. Data persists in a Docker volume between restarts.
-
-If you'd rather use a Postgres install of your own, just update `DATABASE_URL` in `.env`.
+Data is stored in SQLite via Prisma — no database server needed. Locally the database is just a file at `prisma/dev.db`, created automatically the first time you run migrations. In production the bot talks to a hosted [Turso](https://turso.tech) database over libSQL.
 
 ### Development
 
@@ -68,31 +60,47 @@ Then bring up the whole dev environment with one command:
 pnpm up
 ```
 
-This starts the local Postgres container (waits for it to be healthy), applies any pending migrations, and runs the bot with hot reload.
+This applies any pending migrations to the local SQLite file and runs the bot with hot reload.
 
 If you'd rather run the pieces separately:
 ```sh
-docker compose up -d   # start Postgres
-pnpm db:migrate        # apply migrations
+pnpm db:migrate        # apply migrations (creates prisma/dev.db)
 pnpm dev               # run the bot
 ```
 
 ## Deployment
 
-The bot is a long-running worker (Discord gateway + a 1-minute cron loop). It needs an always-on host plus a Postgres database. A `Dockerfile` is included so you can deploy to any container platform.
+The bot is a long-running worker (Discord gateway + a 1-minute cron loop). It needs an always-on host plus a database. A `Dockerfile` is included so you can deploy to any container platform.
 
-### Recommended: Fly.io + Neon (~$0–5/mo)
+### Recommended: Fly.io + Turso (~$0/mo for the database)
 
-1. **Create a Postgres database on [Neon](https://neon.tech)** and copy the connection string.
+1. **Create a database on [Turso](https://turso.tech)** — the free plan is far more than this bot needs:
+   ```sh
+   turso db create letterboxd-bot
+   turso db show letterboxd-bot --url   # -> libsql://letterboxd-bot-<org>.turso.io
+   turso db tokens create letterboxd-bot
+   ```
 2. **Install [`flyctl`](https://fly.io/docs/flyctl/install/)** and run `fly launch --no-deploy --copy-config` from the repo root. If the app name `letterboxd-discord-bot` is taken, Fly will prompt you for a different one — update `fly.toml` to match.
 3. **Set secrets:**
    ```sh
    fly secrets set \
      DISCORD_CLIENT_ID=... \
      DISCORD_TOKEN=... \
-     DATABASE_URL='postgresql://...neon.tech/...?sslmode=require'
+     TURSO_DATABASE_URL='libsql://letterboxd-bot-<org>.turso.io' \
+     TURSO_AUTH_TOKEN='...'
    ```
-4. **Deploy:** `fly deploy`
+4. **Deploy:** `fly deploy` — schema migrations are applied automatically on startup.
+
+### Migrating data from an existing Postgres database
+
+If you're moving off a previous Postgres deployment (e.g. Neon), stop the bot, apply the schema to Turso, then copy the rows with the included one-off script:
+
+```sh
+TURSO_DATABASE_URL='libsql://...' TURSO_AUTH_TOKEN='...' pnpm db:deploy
+POSTGRES_URL='postgresql://...' \
+  TURSO_DATABASE_URL='libsql://...' TURSO_AUTH_TOKEN='...' \
+  NODE_PATH=./ pnpm exec ts-node src/tools/migrate-data.ts
+```
 
 ### Auto-deploy via GitHub Actions
 
@@ -104,4 +112,4 @@ A workflow at `.github/workflows/deploy.yml` deploys to Fly on every push to `ma
 
 ### Other platforms
 
-The included `Dockerfile` works on any container host — Railway, Render, DigitalOcean, a VPS, etc. The bot needs three env vars: `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, `DATABASE_URL` (Postgres).
+The included `Dockerfile` works on any container host — Railway, Render, DigitalOcean, a VPS, etc. The bot needs four env vars: `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`. (Alternatively, on a host with a persistent volume you can skip Turso entirely and set `DATABASE_URL=file:/path/to/bot.db`.)

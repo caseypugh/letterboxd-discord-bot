@@ -11,18 +11,20 @@
 	},
 	"packageManager": "pnpm@10.28.0",
 	"scripts": {
-		"start": "prisma migrate deploy && pnpm db:generate && NODE_PATH=./ ts-node src/app.ts",
-		"up": "docker compose up -d --wait && pnpm db:migrate && pnpm dev",
-		"down": "docker compose down",
+		"start": "pnpm db:deploy && pnpm db:generate && NODE_PATH=./ ts-node src/app.ts",
+		"up": "pnpm db:migrate && pnpm dev",
 		"dev": "NODE_PATH=./ nodemon --watch \"src/**/*\" --ext ts --exec \"ts-node src/app.ts\"",
 		"test-feed": "NODE_PATH=./ ts-node src/tools/test-feed.ts",
 		"test": "ts-node test.ts",
 		"db:migrate": "prisma migrate dev",
+		"db:deploy": "NODE_PATH=./ ts-node src/tools/migrate.ts",
 		"db:generate": "prisma generate"
 	},
 	"dependencies": {
 		"@discordjs/builders": "^0.13.0",
 		"@discordjs/rest": "^0.4.1",
+		"@libsql/client": "^0.17.4",
+		"@prisma/adapter-libsql": "^6.19.3",
 		"@prisma/client": "^6.19.3",
 		"@sentry/node": "^10.53.1",
 		"cron": "^4.4.0",
@@ -38,7 +40,9 @@
 	"devDependencies": {
 		"@types/node": "^24.12.4",
 		"@types/node-fetch": "^2.6.13",
+		"@types/pg": "^8.20.0",
 		"nodemon": "^3.1.14",
+		"pg": "^8.22.0",
 		"prisma": "^6.19.3"
 	},
 	"pnpm": {
