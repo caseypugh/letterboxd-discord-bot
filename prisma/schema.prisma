@@ -21,6 +21,7 @@ model User {
   guild         GuildConfig @relation(fields: [guildId], references: [guildId])
 
   @@unique([username, guildId], name: "userIdentifier")
+  @@index([guildId])
 }
 
 model GuildConfig {
