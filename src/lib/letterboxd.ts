@@ -11,9 +11,10 @@ export class LetterboxdTransientError extends Error {
 }
 
 // Default rss-parser timeout is 60s — same length as our cron interval, so one
-// hung Letterboxd request stalls the entire tick. Cap it well below so we can
-// bail and let the next tick decide what to do.
-const RSS_TIMEOUT_MS = 15000
+// hung Letterboxd request stalls the entire tick. Healthy feeds return in ~1s,
+// so cap well below that: a slow feed is skipped fast and retried next tick
+// rather than holding up everyone behind it.
+const RSS_TIMEOUT_MS = 5000
 
 export async function getLatestDiaryEntries(user: User): Promise<RSSItem[]> {
 	console.log(`Fetching RSS feed for ${user.username} - ${letterboxdRssUrl(user)}`)
