@@ -4,6 +4,7 @@ import { Client, Options, Permissions, InviteScope } from "discord.js"
 import interactionCreate from "./listeners/interactionCreate"
 import { CronJob } from "cron"
 import { CheckFeeds } from "./check-feeds"
+import { isTransientDbError } from "./lib/prisma"
 import { DeployCommandsGlobal } from "./lib/deploy-commands"
 import { resolveEmojis } from "./lib/embed"
 import guildCreate from "./listeners/guildCreate"
@@ -50,8 +51,14 @@ client.on("ready", async () => {
 			try {
 				await CheckFeeds(client)
 			} catch (e) {
-				Sentry.captureException(e)
-				console.error(e)
+				// Turso 5xx / dropped connections self-heal on the next tick; warn instead
+				// of paging Sentry so transient edge blips don't read as bugs.
+				if (isTransientDbError(e)) {
+					console.warn("Transient DB error, tick aborted — retry in 60s:", (e as Error).message)
+				} else {
+					Sentry.captureException(e)
+					console.error(e)
+				}
 			}
 			console.log("~~~~~~~~~ CronJob finished ~~~~~~~~~")
 		},

@@ -1,7 +1,7 @@
 // lib/prisma.ts
 import "dotenv/config"
 import path from "path"
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Prisma } from "@prisma/client"
 import { PrismaLibSQL } from "@prisma/adapter-libsql"
 
 // The bot talks to SQLite through the libSQL driver adapter. In production
@@ -27,5 +27,23 @@ const prisma: PrismaClient = new PrismaClient({
   adapter,
   // log: ["query", "info", "warn", "error"],
 })
+
+// Turso's edge occasionally returns a 5xx or drops a connection mid-query. Prisma
+// surfaces these as PrismaClientUnknownRequestError / PrismaClientInitializationError
+// rather than a typed code. They're transient: the next cron tick retries fine, so
+// callers should bail quietly instead of paging Sentry. Keyed on the HTTP-5xx /
+// connector signals in the message to avoid swallowing genuine query bugs.
+export function isTransientDbError(e: unknown): boolean {
+  if (
+    !(e instanceof Prisma.PrismaClientUnknownRequestError) &&
+    !(e instanceof Prisma.PrismaClientInitializationError)
+  ) {
+    return false
+  }
+  const msg = (e as Error).message || ""
+  return /HTTP status 5\d\d|SERVER_ERROR|ConnectorError|Connection reset|ECONNRESET|ETIMEDOUT|socket hang up/i.test(
+    msg,
+  )
+}
 
 export default prisma
