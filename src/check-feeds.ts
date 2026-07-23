@@ -44,6 +44,12 @@ export const CheckFeeds = async (client: Client) => {
 
 	try {
 		const guilds = client.guilds.cache
+		// A single Letterboxd feed hanging shouldn't abort the whole tick — that
+		// starves every user behind it. Skip isolated transient failures and only
+		// bail the tick once several fetches fail back-to-back, which is the real
+		// signal that Letterboxd (not one feed) is unresponsive. Resets on any success.
+		let consecutiveTransient = 0
+		const MAX_CONSECUTIVE_TRANSIENT = 4
 		guildLoop: for (const [key, guild] of guilds) {
 			console.log("Checking guild", guild.name, "....")
 
@@ -87,6 +93,7 @@ export const CheckFeeds = async (client: Client) => {
 				let items
 				try {
 					items = await getLatestDiaryEntries(user)
+					consecutiveTransient = 0
 				} catch (e) {
 					if (e instanceof LetterboxdUserNotFoundError) {
 						console.warn(`Letterboxd user ${user.username} returned 404, deleting`)
@@ -94,8 +101,21 @@ export const CheckFeeds = async (client: Client) => {
 						continue
 					}
 					if (e instanceof LetterboxdTransientError) {
-						console.warn(`Letterboxd transient error (${e.reason}), bailing tick — retry in 60s`)
-						break guildLoop
+						consecutiveTransient++
+						// A 429 is Letterboxd explicitly rate-limiting us — back off the whole
+						// tick immediately rather than keep hammering other feeds.
+						const rateLimited = e.reason.includes("429")
+						if (rateLimited || consecutiveTransient >= MAX_CONSECUTIVE_TRANSIENT) {
+							console.warn(
+								`Letterboxd transient error (${e.reason}); ${
+									rateLimited ? "rate-limited" : `${consecutiveTransient} in a row`
+								}, bailing tick — retry in 60s`,
+							)
+							break guildLoop
+						}
+						// Isolated flaky feed: skip this user (stays stale, retried next tick).
+						console.warn(`Letterboxd transient error (${e.reason}) for ${user.username}, skipping`)
+						continue
 					}
 					Sentry.withScope((scope) => {
 						scope.setTag("guildId", guild.id)
